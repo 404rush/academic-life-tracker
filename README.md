@@ -1,6 +1,6 @@
 # Academic Life Tracker
 
-A "life in weeks" tracker for UG and PG students — one square per week of your program, scored 1–5, colored like a GitHub contribution graph.
+A "life in weeks" tracker for UG and PG students - one square per week of your program, scored 1–5, colored like a GitHub contribution graph.
 
 **Live site:** [_Academic Life Tracker_](https://404rush.github.io/academic-life-tracker/)
 
