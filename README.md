@@ -2,7 +2,7 @@
 
 Your degree, one little square at a time.
 
-This is a "life in weeks" tracker, GitHub-contribution-graph style — except instead of commits, it's just... you, every week, for however many years this lasts. Pick a start date, pick how your program's structured (semesters, trimesters, whatever your college calls it), and it lays out the whole calendar in front of you. Each week, once it's over, you give it an honest score from 1 to 5 and leave yourself a note if something happened worth remembering.
+This is a "life in weeks" tracker, GitHub-contribution-graph style - except instead of commits, it's just... you, every week, for however many years this lasts. Pick a start date, pick how your program's structured (semesters, trimesters, whatever your college calls it), and it lays out the whole calendar in front of you. Each week, once it's over, you give it an honest score from 1 to 5 and leave yourself a note if something happened worth remembering.
 
 That's really the whole idea. No login, no app store, no "please verify your email." Open the page, start clicking squares.
 
@@ -12,7 +12,7 @@ That's really the whole idea. No login, no app store, no "please verify your ema
 
 - Lets you customize almost anything — rename a semester, carve out your own period (hello, study abroad), fix a date that's wrong without breaking the rest of the year
 - Has its own corner for placement season specifically, because that stretch deserves to be tracked on its own terms
-- Shows you trends over time — streaks, term-vs-break averages, your best and worst weeks
+- Shows you trends over time - streaks, term-vs-break averages, your best and worst weeks
 - Exports what you've built as a backup file, a shareable image, or an actual readable journal
 
 ## Where your data goes
