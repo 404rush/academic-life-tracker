@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- ﹏𓊝﹏  made by Rush  ﹏𓊝﹏ -->
+<meta name="author" content="Rush">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Academic Life Tracker</title>
@@ -17,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+  /* ﹏𓊝﹏ */
   :root {
     --bg:       #f7f4ef;
     --surface:  #ffffff;
@@ -757,6 +760,11 @@
   }
 
   /* ── Quote ── */
+  .sign {
+    margin-top: 30px; font-size: 0.85rem; letter-spacing: 0.4em; text-indent: 0.4em;
+    color: var(--muted); text-align: center; user-select: none;
+    font-family: 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', 'Segoe UI Historic', 'Noto Sans Symbols', 'Apple Symbols', monospace;
+  }
   .quote {
     max-width: 480px; text-align: center;
     margin-top: 52px; border-top: 1.5px solid var(--border);
@@ -955,6 +963,9 @@
   <cite>— adapted from Oliver Burkeman</cite>
 </div>
 
+<!-- ﹏𓊝﹏ -->
+<div class="sign" aria-hidden="true" title="made by Rush">﹏𓊝﹏</div>
+
 <!-- Score Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modalDialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
@@ -1044,6 +1055,11 @@ window.addEventListener('appinstalled', () => {
 </script>
 
 <script>
+// ﹏𓊝﹏ made by Rush
+const SIGN = '﹏𓊝﹏';
+console.log('%c' + SIGN, 'font-size:20px;letter-spacing:4px;',
+  '\nAcademic Life Tracker — made by Rush (Arush Giri)');
+
 // ─────────────────────────────────────────────
 // STORAGE KEYS
 // ─────────────────────────────────────────────
@@ -2659,6 +2675,10 @@ function exportGridPng() {
   ctx.font = "9px 'IBM Plex Mono', monospace";
   ctx.fillStyle = muted;
   ctx.fillText('academic-life-tracker', pad, canvasH - 14);
+  ctx.textAlign = 'right';
+  ctx.font = "11px 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', 'Segoe UI Historic', 'Apple Symbols', monospace";
+  ctx.fillText(SIGN, canvasW - pad, canvasH - 14);
+  ctx.textAlign = 'left';
 
   canvas.toBlob(blob => {
     const url = URL.createObjectURL(blob);
@@ -2710,6 +2730,7 @@ function exportJournalMarkdown() {
     }
   });
 
+  lines.push('', '---', '', '_' + SIGN + ' made with Academic Life Tracker by Rush_');
   const md = lines.join('\n') + '\n';
   const blob = new Blob([md], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
@@ -2794,5 +2815,5 @@ document.getElementById('btnBuild').addEventListener('click', () => {
 })();
 </script>
 
-
+<!-- ﹏𓊝﹏  made by Rush  ﹏𓊝﹏ -->
 </body></html>
