@@ -1,4 +1,5 @@
-// Academic Life Tracker — minimal offline cache.
+// Academic Life Tracker - minimal offline cache.
+// Made by Rush ﹏𓊝﹏ 
 // Strategy: stale-while-revalidate for same-origin app-shell files.
 // Everything else (Google Fonts, etc.) just passes through to the network.
 
@@ -49,3 +50,5 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+//﹏𓊝﹏ 
