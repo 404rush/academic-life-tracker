@@ -1,6 +1,7 @@
 {
   "name": "Academic Life Tracker",
   "short_name": "Academic Tracker",
+  "author": "Rush ﹏𓊝﹏",
   "description": "Track and score every week of your UG or PG academic life.",
   "start_url": "./index.html",
   "scope": "./",
