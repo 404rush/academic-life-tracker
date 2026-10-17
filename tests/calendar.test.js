@@ -1,4 +1,4 @@
-// ﹏𓊝﹏ Academic Life Tracker tests - Arush Giri
+// ﹏𓊝﹏ Academic Life Tracker tests — Arush Giri
 // Run from the project folder with:  node --test
 const test = require('node:test');
 const assert = require('node:assert/strict');
