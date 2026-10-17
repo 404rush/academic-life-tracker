@@ -1,0 +1,18 @@
+# ﹏𓊝﹏ Academic Life Tracker — Arush Giri
+# Runs the automated tests (node --test) on every push and pull request.
+# Results show as a ✓ or ✗ next to each commit on GitHub, under the "Actions" tab.
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test
