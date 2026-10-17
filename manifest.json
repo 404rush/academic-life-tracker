@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "Academic Life Tracker",
+  "short_name": "Academic Tracker",
+  "author": "Arush Giri ﹏𓊝﹏",
+  "description": "Track and score every week of your UG or PG academic life.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f4ef",
+  "theme_color": "#f7f4ef",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
