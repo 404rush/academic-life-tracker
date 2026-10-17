@@ -1,53 +1,53 @@
 # Academic Life Tracker
 
-Your degree, one little square at a time.
-
-This is a "life in weeks" tracker, GitHub-contribution-graph style - except instead of commits, it's just... you, every week, for however many years this lasts. Pick a start date, pick how your program's structured (semesters, trimesters, whatever your college calls it), and it lays out the whole calendar in front of you. Each week, once it's over, you give it an honest score from 1 to 5 and leave yourself a note if something happened worth remembering.
-
-That's really the whole idea. No login, no app store, no "please verify your email." Open the page, start clicking squares.
+A week-by-week tracker for your degree, made for UG and PG students.
 
 **Live site:** _[academic-life-tracker](https://404rush.github.io/academic-life-tracker/)_
 
-## A few things it also does
+You enter the day your program started and how long it runs, and it draws every week as a small square, a bit like the contribution graph on GitHub. Once a week is over, you score it from 1 to 5 and the square gets shaded to match. You can add a note or a few tags too, so future you remembers why a week was good or terrible.
 
-- Lets you customize almost anything — rename a semester, carve out your own period (hello, study abroad), fix a date that's wrong without breaking the rest of the year
-- Has its own corner for placement season specifically, because that stretch deserves to be tracked on its own terms
-- Shows you trends over time - streaks, term-vs-break averages, your best and worst weeks
-- Exports what you've built as a backup file, a shareable image, or an actual readable journal
+I started it as a small UG tracker and it kept growing. It now handles semesters, trimesters and yearly programs, and it has a corner for placement season.
 
-## Where your data goes
+## What you can do
 
-Nowhere, and that's not a dodge — there's genuinely no server behind this thing. Everything you type stays in your browser's local storage, on your device, full stop. Total privacy, but also: it won't magically show up on your other devices. So **export a backup now and then.** One click, and it's the only way to carry your data anywhere else — another browser, another phone, wherever.
+- Build the whole calendar from one start date (2 to 6 years, semester, trimester or annual layout)
+- Edit semester dates and names, or add your own periods, like a study abroad term or an internship
+- Score each week and attach a note and tags
+- Log placement applications: company, round, date, and how it went
+- Open the insights panel for streaks, term time vs break averages, and your best and worst weeks
+- Export a backup file, a PNG of your grid, or a journal in Markdown
+- Switch between light and dark mode
 
-## The files, briefly
+## About your data
 
-| File | Does what |
-|---|---|
-| `index.html` | The whole app. The only file you actually *need*. |
-| `manifest.json` | Lets your phone or desktop treat this like a real installed app. |
-| `sw.js` | Quietly makes it work offline after the first load. |
-| `icon-192.png`, `icon-512.png` | The little icons shown when you install it. |
+Everything stays in your browser. There's no account and no server, so nothing you type gets sent anywhere. The only thing it loads from the internet is the fonts, from Google Fonts.
 
-Keep them all in the same folder — they reference each other with relative paths, so pulling one out on its own breaks things.
+The catch is that your data lives in that one browser on that one device. If you clear your browser data it's gone, and what you fill in on your laptop won't appear on your phone. So hit **Export backup** every now and then, and use **Import backup** to restore it or move it somewhere else.
 
-## Running your own copy
+## Files
 
-1. Drop all 5 files into a repo, root level, no subfolders.
-2. Settings → Pages → Deploy from a branch → `main` → `/ (root)` → Save.
-3. Give it a minute, then visit `https://yourusername.github.io/repo-name/`.
+- `index.html` is the whole app in one file
+- `manifest.json` and the two icons let you install it on your phone or desktop like an app
+- `sw.js` is the service worker, which lets it work offline after the first load
 
-That's the entire deploy. No build step, no `npm install`, nothing to configure — it's one self-contained HTML file quietly doing all the work.
+Keep them in the same folder, since they find each other with relative paths.
 
-(The README, LICENSE and `.gitignore` are just along for the ride — the site itself only needs the five files above.)
+## Putting it online
+
+It's all static files, so GitHub Pages is enough.
+
+1. Put the five files above in the root of a repo.
+2. Go to Settings, then Pages, set the source to "Deploy from a branch", pick `main` and `/ (root)`, and save.
+3. After a minute or so it's live at `https://yourusername.github.io/your-repo/`.
+
+There's no build step and nothing to install.
 
 ## License
 
-MIT — use it, change it, share it, build on it, free of charge. The one ask: keep the credit to the original author attached. Full text in [LICENSE](LICENSE).
+MIT. Use it, change it, share it, even sell it if you want to. All I ask is that you keep my name and the license notice with it. The full text is in `LICENSE`.
 
-## Made by
+## Contact
 
-Arush Giri (Rush) — Integrated B.Sc. & M.Sc in Data Science.
-
-If something's broken, confusing, or you just want to say hi: [rush.outward120@passinbox.com](mailto:rush.outward120@passinbox.com)
+I'm Arush Giri (Rush), Integrated B.Sc. & M.Sc in Data Science. If you find a bug or have an idea, email me at [rush.outward120@passinbox.com](mailto:rush.outward120@passinbox.com).
 
 ﹏𓊝﹏
