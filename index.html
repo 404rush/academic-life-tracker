@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- ﹏𓊝﹏  Academic Life Tracker, made by Arush Giri  ﹏𓊝﹏ -->
+<meta name="author" content="rush">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  // Set the theme before anything is drawn, so dark mode doesn't flash white first.
+  // A choice made with the toggle wins; otherwise follow the device's light/dark setting.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('ugt_theme_v5'); } catch (e) { /* storage blocked: use the device setting */ }
+    if (t !== 'light' && t !== 'dark') t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<title>Academic Life Tracker</title>
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#f7f4ef" id="themeColorMeta">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Academic Tracker">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<meta name="description" content="Track and score every week of your UG or PG academic life.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<!-- ﹏𓊝﹏ Just the one hieroglyph in the sign (𓊝), so it shows on devices without a font for it -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Egyptian+Hieroglyphs&text=%F0%93%8A%9D&display=swap" rel="stylesheet">
+<style>
+  /* ﹏𓊝﹏ */
+  :root {
+    --bg:       #f7f4ef;
+    --surface:  #ffffff;
+    --surface2: #f0ece4;
+    --border:   #d8d0c4;
+    --border2:  #c4b8a8;
+    --text:     #1a1410;
+    --muted:    #6b5f52;
+    --faint:    #706459;
+
+    /* Unscored teaching week */
+    --blank:        #e8e0d4;
+    --blank-border: #c8bca8;
+
+    /* Unscored break week — warm blue-grey tint */
+    --brk:        #dce4f0;
+    --brk-border: #b0bcd4;
+
+    /* Scored greens — rich, clear progression */
+    --g1: #c8e6c9; --g1b: #81c784;
+    --g2: #66bb6a; --g2b: #388e3c;
+    --g3: #2e7d32; --g3b: #1b5e20;
+    --g4: #1b5e20; --g4b: #0a3d0a;
+    --g5: #0a2e0a; --g5b: #000000;
+
+    /* Current week */
+    --now-bg: #1a1410;
+    --now-border: #1a1410;
+    --now-pulse-rgb: 26,20,16;
+
+    /* Primary button hover — must contrast with --bg, which is the button's text colour */
+    --btn-hover: #3a2e24;
+  }
+
+  /* Native controls (date pickers, scrollbars) follow the chosen theme, not the device */
+  :root { color-scheme: light; }
+  [data-theme="dark"] { color-scheme: dark; }
+
+  [data-theme="dark"] {
+    --bg:       #15120e;
+    --surface:  #1e1a15;
+    --surface2: #262019;
+    --border:   #3a3227;
+    --border2:  #4c4133;
+    --text:     #f3ede2;
+    --muted:    #ad9f8c;
+    --faint:    #9c9388;
+
+    --blank:        #2a2419;
+    --blank-border: #3d3527;
+
+    --brk:        #1c2434;
+    --brk-border: #33415c;
+
+    /* Scored greens — brighter = higher score against a dark bg */
+    --g1: #16311a; --g1b: #275c2c;
+    --g2: #276e33; --g2b: #338a41;
+    --g3: #3fa350; --g3b: #4cc061;
+    --g4: #63d477; --g4b: #7fe092;
+    --g5: #a8f0b6; --g5b: #c7f7d1;
+
+    --now-bg: #f3ede2;
+    --now-border: #f3ede2;
+    --now-pulse-rgb: 243,237,226;
+
+    --btn-hover: #d9cfbf;
+  }
+  [data-theme="dark"] .week.p1,
+  [data-theme="dark"] .week.p2 { color: #f3ede2; }
+  [data-theme="dark"] .week.p3,
+  [data-theme="dark"] .week.p4,
+  [data-theme="dark"] .week.p5 { color: #0e1a10; }
+  [data-theme="dark"] .score-btn[data-s="1"],
+  [data-theme="dark"] .score-btn[data-s="2"] { color: #f3ede2; }
+  [data-theme="dark"] .score-btn[data-s="3"],
+  [data-theme="dark"] .score-btn[data-s="4"],
+  [data-theme="dark"] .score-btn[data-s="5"] { color: #0e1a10; }
+  [data-theme="dark"] body { -webkit-font-smoothing: antialiased; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 52px 20px 80px;
+  }
+
+  /* ── Theme toggle ── */
+  .theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 50;
+    background: var(--surface); border: 1.5px solid var(--border2);
+    color: var(--muted); width: 34px; height: 34px; border-radius: 50%;
+    cursor: pointer; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .theme-toggle:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 40px; max-width: 640px; }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.9rem, 5vw, 3.2rem);
+    font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 12px;
+    color: var(--text);
+  }
+  .header h1 em { font-style: italic; color: var(--muted); }
+  .header-subtitle {
+    font-size: 0.748rem; color: var(--faint); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  .header p { font-size: 0.769rem; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; line-height: 2.2; }
+  .privacy-note {
+    margin-top: 14px; font-size: 0.758rem; color: var(--muted);
+    letter-spacing: 0.02em; line-height: 1.6; max-width: 480px;
+    margin-left: auto; margin-right: auto;
+  }
+
+  /* ── Start date card ── */
+  .start-card {
+    width: 100%; max-width: 860px;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 6px;
+    padding: 22px 26px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .start-card-left { flex: 1; min-width: 200px; }
+  .start-card-left strong { display: block; font-size: 0.781rem; color: var(--text); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 5px; }
+  .start-card-left span { font-size: 0.753rem; color: var(--muted); line-height: 1.8; }
+
+  .start-input-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  select.yrs-select {
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.772rem;
+    padding: 9px 10px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  select.yrs-select:focus { border-color: var(--text); }
+
+  input[type="date"] {
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.795rem;
+    padding: 9px 12px;
+    border-radius: 3px;
+    outline: none;
+    width: 148px;
+    transition: border-color 0.2s;
+  }
+  input[type="date"]:focus { border-color: var(--text); }
+
+  .btn-primary {
+    background: var(--text);
+    border: none;
+    color: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: var(--btn-hover); }
+
+  /* ── Advanced toggle ── */
+  .advanced-toggle {
+    width: 100%; max-width: 860px;
+    margin-bottom: 8px;
+    text-align: right;
+  }
+  .advanced-toggle button {
+    background: none; border: none;
+    color: var(--faint);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.744rem; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; padding: 4px 0;
+    transition: color 0.15s;
+  }
+  .advanced-toggle button:hover { color: var(--muted); }
+
+  /* ── Advanced panel ── */
+  .advanced-panel {
+    width: 100%; max-width: 860px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    display: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .advanced-panel.open { display: block; }
+
+  .adv-header {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.748rem; color: var(--muted);
+    letter-spacing: 0.07em; text-transform: uppercase;
+    background: var(--surface2);
+    border-radius: 6px 6px 0 0;
+  }
+
+  .adv-body { padding: 16px 18px; }
+
+  .adv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .adv-year {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+  }
+
+  .adv-year h3 {
+    font-size: 0.748rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+
+  .adv-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+
+  .adv-label {
+    font-size: 0.734rem; color: var(--muted);
+    width: 90px; flex-shrink: 0;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+
+  .adv-pair { display: flex; align-items: center; gap: 5px; }
+
+  .adv-pair input[type="date"] {
+    font-size: 0.748rem; padding: 5px 7px; width: 116px;
+    border: 1px solid var(--border);
+  }
+
+  .adv-default { flex-basis: 100%; padding-left: 98px; margin-top: -2px; font-size: 0.72rem; color: var(--faint); }
+  @media (max-width: 500px) { .adv-default { padding-left: 0; } }
+  .sep { font-size: 0.73rem; color: var(--faint); }
+
+  /* Global period rename section */
+  .adv-rename-section {
+    margin-bottom: 14px; padding-bottom: 14px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .adv-rename-title {
+    font-size: 0.753rem; font-weight: 600; color: var(--text);
+    margin-bottom: 8px;
+  }
+  .adv-rename-hint { font-weight: 400; color: var(--faint); font-size: 0.739rem; }
+  .adv-rename-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .adv-rename-item { display: flex; flex-direction: column; gap: 4px; min-width: 130px; }
+  .adv-rename-item label { font-size: 0.734rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .adv-rename-item input {
+    font-size: 0.758rem; padding: 7px 9px;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    background: var(--surface); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; outline: none;
+  }
+  .adv-rename-item input:focus { border-color: var(--text); }
+
+  /* ── Placement Tracker ── */
+  .placement-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px; margin-bottom: 16px;
+  }
+
+  .placement-form {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1.5px solid var(--border);
+  }
+  .placement-form input[type="text"],
+  .placement-form input[type="date"],
+  .placement-form select {
+    font-size: 0.758rem; padding: 8px 10px;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    background: var(--surface); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; outline: none;
+  }
+  .placement-form input[type="text"]:focus,
+  .placement-form input[type="date"]:focus,
+  .placement-form select:focus { border-color: var(--text); }
+  .placement-form input#pl-company { width: 140px; }
+  .placement-form input#pl-note { width: 160px; flex: 1; min-width: 120px; }
+
+  .placement-company-group {
+    margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  }
+  .placement-company-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .placement-company-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; gap: 8px; flex-wrap: wrap;
+  }
+  .placement-company-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--text); }
+  .placement-status-chip {
+    font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 4px 10px; border-radius: 10px; font-weight: 600;
+  }
+  .placement-status-chip.applied   { background: var(--surface2); color: var(--muted); }
+  .placement-status-chip.oa        { background: #dce4f0; color: #2c4a7c; }
+  .placement-status-chip.interview { background: #f5e3c4; color: #7c5a1e; }
+  .placement-status-chip.offer     { background: var(--g3); color: #fff; }
+  .placement-status-chip.rejected  { background: #f0d8d8; color: #9c3b3b; }
+  [data-theme="dark"] .placement-status-chip.oa        { background: #263a5c; color: #b9cdf0; }
+  [data-theme="dark"] .placement-status-chip.interview { background: #4a3a1a; color: #f0d9a0; }
+  [data-theme="dark"] .placement-status-chip.rejected  { background: #4a2323; color: #f0b9b9; }
+
+  .placement-event-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-size: 0.748rem; color: var(--muted); padding: 4px 0;
+  }
+  .placement-event-row .pe-stage { color: var(--text); font-weight: 600; min-width: 90px; }
+  .placement-event-row .pe-date { color: var(--faint); }
+  .placement-event-row .pe-note { color: var(--muted); font-style: italic; }
+  .placement-event-remove {
+    background: none; border: none; color: var(--faint); cursor: pointer;
+    font-size: 0.776rem; padding: 2px 4px;
+  }
+  .placement-event-remove:hover { color: #b23b3b; }
+  .placement-event-edit {
+    background: none; border: none; color: var(--faint); cursor: pointer;
+    font-size: 0.8rem; padding: 2px 4px; margin-left: auto; /* pushes edit + remove to the right */
+  }
+  .placement-event-edit:hover { color: var(--text); }
+  .placement-event-row.editing { background: var(--surface2); border-radius: 3px; }
+  .placement-form.editing { border-bottom-color: var(--text); }
+
+  /* Marker for weeks with a placement event — distinct from the note dot (top-right) */
+  .week-placement-dot {
+    position: absolute; bottom: -2px; left: -2px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #c9932e; border: 1px solid var(--surface);
+    pointer-events: none;
+  }
+
+  /* Custom (user-added) periods */
+  .adv-custom-list { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .adv-custom-row {
+    display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .adv-custom-row input[type="text"] {
+    font-size: 0.748rem; padding: 5px 7px; width: 92px;
+    border: 1px solid var(--border); border-radius: 3px;
+    background: var(--surface); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .adv-custom-row select {
+    font-size: 0.739rem; padding: 5px 4px;
+    border: 1px solid var(--border); border-radius: 3px;
+    background: var(--surface); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .adv-custom-row input[type="date"] {
+    font-size: 0.748rem; padding: 5px 6px; width: 108px;
+    border: 1px solid var(--border);
+  }
+  .adv-custom-remove {
+    background: none; border: none; color: var(--faint);
+    cursor: pointer; font-size: 0.85rem; line-height: 1; padding: 2px 4px;
+  }
+  .adv-custom-remove:hover { color: #b23b3b; }
+  .adv-add-period {
+    background: none; border: 1px dashed var(--border2); color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.739rem;
+    padding: 6px 10px; border-radius: 3px; cursor: pointer;
+    margin-top: 2px;
+  }
+  .adv-add-period:hover { border-color: var(--text); color: var(--text); }
+
+  .adv-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ── Data bar (export/import/reset) ── */
+  .data-bar {
+    width: 100%; max-width: 860px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .data-bar-note { font-size: 0.739rem; color: var(--faint); letter-spacing: 0.03em; }
+  .data-bar-note.stale { color: #9c3b3b; }
+  [data-theme="dark"] .data-bar-note.stale { color: #f0b9b9; }
+  .data-bar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .data-bar-actions .btn-secondary { font-size: 0.744rem; padding: 8px 12px; }
+  .btn-danger-text {
+    background: none; border: none; color: var(--faint);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.744rem; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+    padding: 8px 4px;
+  }
+  .btn-danger-text:hover { color: #b23b3b; }
+
+  /* ── Unscored-weeks nudge banner ── */
+  .nudge-banner {
+    width: 100%; max-width: 860px;
+    background: var(--surface2);
+    border: 1.5px dashed var(--border2);
+    border-radius: 5px;
+    padding: 10px 18px;
+    margin-bottom: 16px;
+    display: none;
+    align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+    font-size: 0.753rem; color: var(--muted); letter-spacing: 0.03em;
+  }
+  .nudge-banner.show { display: flex; }
+  .nudge-banner strong { color: var(--text); }
+
+  .btn-secondary {
+    background: none;
+    border: 1.5px solid var(--border2);
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.753rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 9px 14px; border-radius: 3px; cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Current week bar ── */
+  .cwbar {
+    width: 100%; max-width: 860px;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 5px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .cwbar-left strong {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 4px;
+  }
+  .cwbar-left span { font-size: 0.748rem; color: var(--muted); letter-spacing: 0.04em; }
+  .cwbar-right { font-size: 0.748rem; color: var(--muted); text-align: right; line-height: 2; }
+
+  /* ── Stats ── */
+  .stats {
+    display: flex; width: 100%; max-width: 860px;
+    margin-bottom: 20px;
+    border: 1.5px solid var(--border2);
+    border-radius: 5px; overflow: hidden; flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .stat {
+    text-align: center; padding: 14px 12px;
+    border-right: 1px solid var(--border);
+    flex: 1; min-width: 80px;
+    background: var(--surface);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem; font-weight: 700; display: block; line-height: 1;
+  }
+  .s-gone  { color: var(--faint); }
+  .s-score { color: var(--g3); }
+  .s-avg   { color: var(--g3); }
+  .s-left  { color: var(--text); }
+  .stat-label { font-size: 0.723rem; color: var(--faint); text-transform: uppercase; letter-spacing: 0.09em; margin-top: 6px; display: block; line-height: 1.6; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    margin-bottom: 28px; justify-content: center; max-width: 860px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.748rem; color: var(--muted);
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .lsq { width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0; border: 1px solid transparent; }
+  .lsq.blank    { background: var(--blank); border-color: var(--blank-border); }
+  .lsq.brkblank { background: var(--brk);   border: 1px dashed var(--brk-border); }
+  .lsq.p1 { background: var(--g1); border-color: var(--g1b); }
+  .lsq.p2 { background: var(--g2); border-color: var(--g2b); }
+  .lsq.p3 { background: var(--g3); border-color: var(--g3b); }
+  .lsq.p4 { background: var(--g4); border-color: var(--g4b); }
+  .lsq.p5 { background: var(--g5); border-color: var(--g5b); }
+  .lsq.now { background: var(--now-bg); border-color: var(--now-border); }
+  .legend-swatches { display: flex; gap: 2px; align-items: center; }
+  .legend-arrow { font-size: 0.718rem; color: var(--faint); margin: 0 2px; }
+  .legend-item.legend-hint { color: var(--faint); }
+
+  /* ── Insights panel ── */
+  .insight-toggle-wrap { width: 100%; max-width: 860px; margin-bottom: 8px; text-align: right; }
+  .insight-toggle-wrap .btn-secondary { font-size: 0.748rem; padding: 9px 14px; }
+  #btnAddPlacement { padding: 8px 16px; }
+  #btnSaveWeek { padding: 9px 18px; }
+  .insight-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px; margin-bottom: 16px;
+  }
+  .insight-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 12px 14px;
+  }
+  .insight-card .ic-label { font-size: 0.73rem; color: var(--faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+  .insight-card .ic-value { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .insight-card .ic-sub { font-size: 0.73rem; color: var(--muted); margin-top: 4px; display: block; line-height: 1.6; }
+  .insight-chart-wrap { margin-bottom: 14px; }
+  .chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .chart-scroll svg { display: block; }
+  .insight-chart-title { font-size: 0.739rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .insight-empty.compact { padding: 8px 0; }
+  .filter-note { margin-top: 2px; }
+  .filter-note strong { color: var(--text); }
+  .filter-note .btn-danger-text { padding: 2px 0; font-size: 0.734rem; }
+  .grid-empty .accent { color: var(--g3); }
+  .insight-empty { font-size: 0.753rem; color: var(--faint); padding: 20px 0; text-align: center; }
+
+  /* ── Grid ── */
+  .grid-container { width: 100%; max-width: 860px; }
+
+  .grid-empty {
+    text-align: center; padding: 60px 20px;
+    color: var(--muted); font-size: 0.767rem; letter-spacing: 0.06em; line-height: 2.5;
+    border: 1.5px dashed var(--border2); border-radius: 6px;
+    background: var(--surface);
+  }
+
+  .year-block {
+    margin-bottom: 18px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .year-label {
+    font-size: 0.746rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .block-row {
+    display: flex; gap: 3px; margin-bottom: 5px;
+    align-items: flex-start; flex-wrap: wrap;
+  }
+
+  .row-label {
+    font-size: 0.73rem; color: var(--muted);
+    width: 120px; text-transform: uppercase;
+    letter-spacing: 0.04em; flex-shrink: 0;
+    line-height: 1.4; padding-top: 3px;
+  }
+  .row-label small { display: block; color: var(--faint); font-size: 0.709rem; margin-top: 2px; }
+
+  .weeks-row { display: flex; gap: 3px; flex-wrap: wrap; }
+
+  /* ── Week squares ── */
+  .week {
+    width: 21px; height: 21px; border-radius: 3px;
+    flex-shrink: 0; cursor: default; position: relative;
+    transition: transform 0.1s, box-shadow 0.1s;
+    border: 1px solid transparent;
+  }
+
+  /* Unscored teaching */
+  .week.blank    { background: var(--blank);   border-color: var(--blank-border); }
+  /* Unscored break */
+  .week.brkblank { background: var(--brk);     border: 1px dashed var(--brk-border); }
+
+  /* Scored greens — 5 levels, light to very dark */
+  .week.p1 { background: var(--g1); border-color: var(--g1b); color: var(--text); }
+  .week.p2 { background: var(--g2); border-color: var(--g2b); color: var(--text); }
+  .week.p3 { background: var(--g3); border-color: var(--g3b); color:#fff; }
+  .week.p4 { background: var(--g4); border-color: var(--g4b); color:#fff; }
+  .week.p5 { background: var(--g5); border-color: var(--g5b); color:#fff; }
+
+  /* Current week — solid square, unscored */
+  .week.now {
+    background: var(--now-bg);
+    border-color: var(--now-border);
+    animation: nowpulse 2s infinite;
+  }
+  /* Current week, already scored mid-week — keep its score color, add the pulse ring */
+  .week.now-scored { animation: nowpulse 2s infinite; }
+  @keyframes nowpulse {
+    0%,100% { box-shadow: 0 0 0 2px rgba(var(--now-pulse-rgb),0.18); }
+    50%      { box-shadow: 0 0 0 5px rgba(var(--now-pulse-rgb),0.08), 0 0 10px rgba(var(--now-pulse-rgb),0.09); }
+  }
+
+  .week.clickable { cursor: pointer; }
+  /* Hover zoom only for real pointers — on touch screens :hover "sticks" after a tap */
+  @media (hover: hover) {
+    .week.clickable:hover { transform: scale(1.5); z-index: 20; box-shadow: 0 0 0 2px var(--g3); }
+  }
+  .week.clickable:focus-visible {
+    outline: none; transform: scale(1.5); z-index: 20;
+    box-shadow: 0 0 0 2px var(--text);
+  }
+
+  /* Score shown as a digit on the square itself — not color-only */
+  .week-digit {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.741rem; font-weight: 600; pointer-events: none;
+    opacity: 0.85;
+  }
+
+  /* Small dot marker when a week has a note and/or tags attached */
+  .week-note-dot {
+    position: absolute; top: -2px; right: -2px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text); border: 1px solid var(--surface);
+    pointer-events: none;
+  }
+
+  /* Tag filter — dim non-matching weeks, ring the matches */
+  .week.dimmed { opacity: 0.14; }
+  .week.filter-match { box-shadow: 0 0 0 1.5px var(--g3); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,20,16,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300; opacity: 0; pointer-events: none; visibility: hidden;
+    transition: opacity 0.18s, visibility 0s linear 0.18s;
+  }
+  .modal-overlay.open {
+    opacity: 1; pointer-events: all; visibility: visible;
+    transition: opacity 0.18s, visibility 0s linear 0s;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 28px 32px;
+    max-width: 420px; width: 92%; text-align: center;
+    max-height: 88vh; overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+
+  .modal:focus { outline: none; } /* the dialog itself takes focus on open; its buttons keep their rings */
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; color: var(--text); margin-bottom: 4px;
+  }
+  .modal-sub {
+    font-size: 0.744rem; color: var(--muted);
+    letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 18px;
+  }
+  /* Placement events for the week — shown here because touch screens have no hover tooltip */
+  .modal-placements {
+    font-size: 0.744rem; color: var(--muted); margin: -8px 0 16px; line-height: 1.6;
+  }
+  .modal-placements:empty { display: none; }
+  .modal-prompt {
+    font-size: 0.762rem; color: var(--muted); margin-bottom: 20px; line-height: 1.8;
+  }
+
+  .score-btns { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+
+  .score-btn {
+    width: 54px; height: 56px; border-radius: 4px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem; font-weight: 500;
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px;
+    border: 2px solid transparent;
+  }
+  @media (hover: hover) { .score-btn:hover { transform: scale(1.08); } }
+  .score-btn.active { border-color: var(--text) !important; box-shadow: 0 0 0 2px rgba(26,20,16,0.2); }
+
+  .score-btn[data-s="1"] { background: var(--g1); border-color: var(--g1b); color: var(--text); }
+  .score-btn[data-s="2"] { background: var(--g2); border-color: var(--g2b); color: var(--text); }
+  .score-btn[data-s="3"] { background: var(--g3); border-color: var(--g3b); color: #fff; }
+  .score-btn[data-s="4"] { background: var(--g4); border-color: var(--g4b); color: #fff; }
+  .score-btn[data-s="5"] { background: var(--g5); border-color: var(--g5b); color: #fff; }
+
+  .slabel { font-size: 0.688rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.8; line-height: 1; }
+
+  .modal-section-label {
+    display: block; font-size: 0.734rem; color: var(--faint); text-transform: uppercase;
+    letter-spacing: 0.08em; text-align: left; margin-bottom: 6px;
+  }
+
+  .modal-note {
+    width: 100%; resize: vertical; min-height: 52px; max-height: 140px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 4px; color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.767rem;
+    padding: 9px 10px; margin-bottom: 14px; outline: none;
+    line-height: 1.5;
+  }
+  .modal-note:focus { border-color: var(--text); }
+
+  .tag-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; justify-content: flex-start; }
+  .tag-chip {
+    background: var(--surface2); border: 1px solid var(--border2);
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.734rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 5px 9px; border-radius: 12px; cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .tag-chip:hover { border-color: var(--text); }
+  .tag-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .tag-input-row { display: flex; gap: 6px; margin-bottom: 16px; }
+  .tag-input {
+    flex: 1; background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 4px; color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.753rem;
+    padding: 7px 9px; outline: none;
+  }
+  .tag-input:focus { border-color: var(--text); }
+  .tag-input-add {
+    background: var(--surface2); border: 1.5px solid var(--border);
+    color: var(--muted); border-radius: 4px; cursor: pointer;
+    font-size: 0.776rem; width: 30px;
+  }
+  .tag-input-add:hover { border-color: var(--text); color: var(--text); }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border2); color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.744rem; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 3px; cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Tooltip ── */
+  .tooltip {
+    position: fixed;
+    background: var(--text); color: var(--bg);
+    font-size: 0.744rem; padding: 5px 10px;
+    pointer-events: none; opacity: 0; transition: opacity 0.1s;
+    z-index: 200; letter-spacing: 0.04em; border-radius: 3px;
+    max-width: min(360px, calc(100vw - 16px)); line-height: 1.5;
+    left: 0; top: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+
+  /* ── In-page dialog ── */
+  .ui-dialog {
+    margin: auto; border: 1.5px solid var(--border2); border-radius: 8px;
+    background: var(--surface); color: var(--text);
+    padding: 24px 26px; width: min(440px, calc(100vw - 32px));
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+  .ui-dialog::backdrop { background: rgba(26,20,16,0.55); }
+  .ui-dialog h2 { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 10px; }
+  .ui-dialog-body { font-size: 0.8rem; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+  .ui-dialog-body p + p, .ui-dialog-body p + ul, .ui-dialog-body ul + p { margin-top: 10px; }
+  .ui-dialog-body ul { padding-left: 18px; color: var(--text); }
+  .ui-dialog-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .ui-dialog-actions .btn-primary { padding: 9px 18px; }
+  .ui-dialog-actions .btn-primary.danger { background: #b23b3b; color: #fff; }
+  .ui-dialog-actions .btn-primary.danger:hover { background: #8f2c2c; }
+
+  /* ── Undo toast ── */
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 600;
+    display: flex; align-items: center; gap: 16px;
+    max-width: calc(100vw - 32px); width: max-content;
+    background: var(--text); color: var(--bg);
+    font-size: 0.78rem; padding: 12px 18px; border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .toast[hidden] { display: none; }
+  .toast button {
+    background: none; border: 1px solid currentColor; color: inherit; border-radius: 3px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 6px 12px; cursor: pointer;
+  }
+
+  /* ── Install banner ── */
+  .install-banner {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 500;
+    display: flex; align-items: center; gap: 14px;
+    width: max-content; max-width: calc(100vw - 32px);
+    background: var(--text); color: var(--bg);
+    font-size: 0.758rem; letter-spacing: 0.06em;
+    padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .install-banner[hidden] { display: none; }
+  .install-banner button { font-family: 'IBM Plex Mono', monospace; font-size: 0.753rem; cursor: pointer; border: none; }
+  .install-btn { background: var(--g3); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 14px; border-radius: 3px; }
+  .install-dismiss { background: none; color: var(--faint); padding: 4px; }
+
+  /* ── Footer: the sign and the quote ── */
+  .sign {
+    margin-top: 30px; font-size: 0.85rem; letter-spacing: 0.4em; text-indent: 0.4em;
+    color: var(--muted); text-align: center; user-select: none;
+    font-family: 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', 'Segoe UI Historic', 'Noto Sans Symbols', 'Apple Symbols', monospace;
+    background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+  }
+  .sign:hover { color: var(--text); }
+
+  /* ﹏𓊝﹏ the little sign that appears around the app — and the wave it sends across the grid */
+  .panel-sign, .grid-empty-sign {
+    text-align: center; color: var(--faint); opacity: 0.6; letter-spacing: 0.3em; margin-top: 14px;
+    font-family: 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', 'Segoe UI Historic', 'Noto Sans Symbols', 'Apple Symbols', monospace;
+    user-select: none;
+  }
+  @keyframes signwave { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+  .grid-container.signwave .week { animation: signwave 0.6s ease both; animation-delay: calc(var(--i, 0) * 6ms); }
+  /* People who ask their device for less motion get no pulsing, zooming or waves */
+  @media (prefers-reduced-motion: reduce) {
+    .week.now, .week.now-scored, .grid-container.signwave .week { animation: none; }
+    .week, .score-btn { transition: none; }
+    .week.clickable:hover, .week.clickable:focus-visible, .score-btn:hover { transform: none; }
+  }
+  .quote {
+    max-width: 480px; text-align: center;
+    margin-top: 52px; border-top: 1.5px solid var(--border);
+    padding-top: 36px;
+  }
+  .quote p {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 1rem; color: var(--muted); line-height: 1.9;
+  }
+  .quote cite {
+    display: block; margin-top: 12px;
+    font-size: 0.739rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--faint); font-style: normal;
+  }
+
+  /* Phones: the period label moves above its weeks so the squares get the full width, and the
+     squares grow from 21px to 28px so they're tappable (a long semester wraps onto two lines). */
+  @media (max-width: 500px) {
+    body { padding: 52px 14px 80px; }
+    .theme-toggle { position: absolute; } /* scrolls away instead of covering content */
+    .cwbar-right { text-align: left; }
+    .header p { letter-spacing: 0.03em; line-height: 1.9; }
+    .block-row { flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .row-label { width: auto; padding-top: 0; display: flex; gap: 8px; align-items: baseline; }
+    .row-label small { display: inline; margin-top: 0; }
+    .weeks-row { gap: 4px; }
+    .week { width: 28px; height: 28px; border-radius: 4px; }
+    .week-digit { font-size: 0.8rem; }
+    .week-note-dot, .week-placement-dot { width: 8px; height: 8px; }
+    .year-block { padding: 12px; }
+    .stat-num { font-size: 1.4rem; }
+    .score-btns { gap: 6px; }
+    .score-btn { width: 50px; }
+    .modal { padding: 22px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<button type="button" class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+
+<div class="header">
+  <h1>Academic Life <em>Tracker</em></h1>
+  <div class="header-subtitle">for UG &amp; PG students</div>
+  <p>
+    Enter the first day of your program.<br>
+    Score each week honestly, once it's over.<br>
+    No one is watching. The record is yours alone.
+  </p>
+  <div class="privacy-note">🔒 Nothing here is uploaded anywhere — everything you enter stays in this browser, on this device.</div>
+</div>
+
+<!-- Start date -->
+<div class="start-card">
+  <div class="start-card-left">
+    <strong>First day of your program</strong>
+    <span id="startCardDesc"></span>
+  </div>
+  <div class="start-input-wrap">
+    <input type="date" id="startDate" aria-label="First day of your program">
+    <select class="yrs-select" id="programYears" title="Length of your program" aria-label="Length of your program">
+      <option value="2">2 years</option>
+      <option value="3">3 years</option>
+      <option value="4" selected>4 years</option>
+      <option value="5">5 years</option>
+      <option value="6">6 years</option>
+    </select>
+    <select class="yrs-select" id="calendarPreset" title="Academic calendar structure" aria-label="Academic calendar structure">
+      <option value="semester" selected>Semester (2 terms/yr)</option>
+      <option value="trimester">Trimester (3 terms/yr)</option>
+      <option value="annual">Annual (1 term/yr)</option>
+    </select>
+    <select class="yrs-select" id="placementMode" title="When to show the placement tracker" aria-label="Placement tracker">
+      <option value="auto">Placements: from final year</option>
+      <option value="on">Placements: always show</option>
+      <option value="off">Placements: hide</option>
+    </select>
+    <button type="button" class="btn-primary" id="btnBuild">Build my calendar →</button>
+  </div>
+</div>
+
+<!-- Advanced toggle -->
+<div class="advanced-toggle">
+  <button type="button" id="advToggleBtn">⚙ Adjust term dates &amp; names</button>
+</div>
+
+<!-- Advanced panel -->
+<div class="advanced-panel" id="advPanel">
+  <div class="adv-header">Change any period's dates or name — leave a date blank to keep the automatic one. Changing where a period starts or ends moves its neighbour's automatic date with it. You can also add your own periods: a custom period cuts into whatever's underneath it, so it doesn't have to line up with a term or break. Each week belongs to the period its first day falls in, so a period needs to include at least one week's first day to show up.</div>
+  <div class="adv-body">
+    <div class="adv-rename-section" id="advRenameSection">
+      <div class="adv-rename-title">Rename periods <span class="adv-rename-hint">(applies to all years — leave blank to keep the default name)</span></div>
+      <div class="adv-rename-row" id="advRenameRow"></div>
+    </div>
+    <div class="adv-grid" id="advGrid"></div>
+    <div class="adv-actions">
+      <button type="button" class="btn-primary" id="btnAdvSave">Save &amp; rebuild</button>
+      <button type="button" class="btn-secondary" id="btnAdvClear">Clear all overrides</button>
+    </div>
+  </div>
+</div>
+
+<!-- Backup / data controls -->
+<div class="data-bar">
+  <span class="data-bar-note" id="backupNote">⚠ Your data lives only in this browser. Export a backup regularly.</span>
+  <div class="data-bar-actions">
+    <button type="button" class="btn-secondary" id="btnExport">⬇ Export backup</button>
+    <button type="button" class="btn-secondary" id="btnImportTrigger">⬆ Import backup</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <button type="button" class="btn-danger-text" id="btnResetAll">Reset all data</button>
+  </div>
+</div>
+
+<!-- Unscored weeks nudge -->
+<div class="nudge-banner" id="nudgeBanner">
+  <span id="nudgeText"></span>
+  <button type="button" class="btn-primary" id="btnScoreNext">Score last week →</button>
+</div>
+
+<!-- Current week bar -->
+<div class="cwbar">
+  <div class="cwbar-left">
+    <strong id="cwTitle">—</strong>
+    <span id="cwDetail"></span>
+  </div>
+  <div class="cwbar-right">
+    Today: <strong id="cwToday"></strong><br>
+    <span id="cwOverall"></span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat"><span class="stat-num s-gone" id="st-gone">—</span><span class="stat-label">weeks<br>elapsed</span></div>
+  <div class="stat"><span class="stat-num s-score" id="st-scored">—</span><span class="stat-label">weeks<br>scored</span></div>
+  <div class="stat"><span class="stat-num s-avg" id="st-avg">—</span><span class="stat-label">average<br>score</span></div>
+  <div class="stat"><span class="stat-num s-left" id="st-left">—</span><span class="stat-label">weeks<br>remaining</span></div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-swatches">
+      <div class="lsq blank"></div><span class="legend-arrow">→</span>
+      <div class="lsq p1"></div><div class="lsq p2"></div><div class="lsq p3"></div><div class="lsq p4"></div><div class="lsq p5"></div>
+    </div>
+    Term week (unscored → score 1–5)
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatches">
+      <div class="lsq brkblank"></div><span class="legend-arrow">→</span>
+      <div class="lsq p1"></div><div class="lsq p5"></div>
+    </div>
+    Holiday week (also scoreable)
+  </div>
+  <div class="legend-item">
+    <div class="lsq now"></div>
+    This week
+  </div>
+  <div class="legend-item legend-hint">← click or tap any past week to score it</div>
+</div>
+
+<!-- Insights toggle -->
+<div class="insight-toggle-wrap">
+  <button type="button" id="insightToggleBtn" class="btn-secondary">📊 Show insights</button>
+  <button type="button" id="placementToggleBtn" class="btn-secondary">🎯 Placements</button>
+  <button type="button" id="btnSharePng" class="btn-secondary">🖼 Share as image</button>
+  <button type="button" id="btnExportJournal" class="btn-secondary">📖 Export journal</button>
+</div>
+
+<!-- Insights panel -->
+<div class="advanced-panel" id="insightPanel">
+  <div class="adv-header">Insights — computed from your scored weeks only</div>
+  <div class="adv-body" id="insightBody">
+    <div class="insight-empty">Score a few weeks to unlock insights.</div>
+  </div>
+</div>
+
+<!-- Placement Tracker panel -->
+<div class="advanced-panel" id="placementPanel">
+  <div class="adv-header">Placement Tracker — log applications and interview rounds as they happen. Private, same as everything else here.</div>
+  <div class="adv-body">
+    <div class="placement-stats" id="placementStats"></div>
+
+    <div class="placement-form">
+      <input type="text" id="pl-company" placeholder="Company" maxlength="40" list="pl-company-list" autocomplete="off" aria-label="Company">
+      <datalist id="pl-company-list"></datalist>
+      <select id="pl-stage" aria-label="Round">
+        <option value="applied">Applied</option>
+        <option value="oa">OA / Online Test</option>
+        <option value="interview">Interview</option>
+        <option value="offer">Offer</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <input type="date" id="pl-date" aria-label="Date">
+      <input type="text" id="pl-note" placeholder="Note (optional)" maxlength="80" aria-label="Note (optional)">
+      <button type="button" class="btn-primary" id="btnAddPlacement">Add</button>
+      <button type="button" class="btn-ghost" id="btnCancelPlacementEdit" hidden>Cancel</button>
+    </div>
+
+    <div id="placementList"></div>
+    <div class="panel-sign" aria-hidden="true">﹏𓊝﹏</div>
+  </div>
+</div>
+
+<!-- Grid -->
+<div class="grid-container" id="grid"></div>
+
+<div class="quote">
+  <p>"The question is not whether you'll be distracted and lazy sometimes.<br>The question is whether you'll notice, and what you'll do next."</p>
+  <cite>— adapted from Oliver Burkeman</cite>
+</div>
+
+<!-- ﹏𓊝﹏ -->
+<button type="button" class="sign" id="signMark" title="made by Arush Giri" aria-label="Made by Arush Giri">﹏𓊝﹏</button>
+
+<!-- Score Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalDialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+    <h2 id="modal-title">Week</h2>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="modal-placements" id="modal-placements"></div>
+    <p class="modal-prompt">How productive and meaningful was this week, in your honest assessment?</p>
+    <div class="score-btns" role="group" aria-label="Score for this week">
+      <button type="button" class="score-btn" data-s="1">1<span class="slabel">poor</span></button>
+      <button type="button" class="score-btn" data-s="2">2<span class="slabel">low</span></button>
+      <button type="button" class="score-btn" data-s="3">3<span class="slabel">okay</span></button>
+      <button type="button" class="score-btn" data-s="4">4<span class="slabel">good</span></button>
+      <button type="button" class="score-btn" data-s="5">5<span class="slabel">great</span></button>
+    </div>
+
+    <label class="modal-section-label" for="modal-note">Note (optional)</label>
+    <textarea class="modal-note" id="modal-note" placeholder="What happened this week? What made it that score?" maxlength="500"></textarea>
+
+    <div class="modal-section-label" id="modal-tags-label">Tags (optional)</div>
+    <div class="tag-chips" id="modal-tag-chips" role="group" aria-labelledby="modal-tags-label"></div>
+    <div class="tag-input-row">
+      <input type="text" class="tag-input" id="modal-tag-input" placeholder="Add a custom tag, press Enter" aria-label="Add a custom tag">
+      <button type="button" class="tag-input-add" id="modal-tag-add" title="Add tag" aria-label="Add tag">+</button>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" id="btnSaveWeek">Save</button>
+      <button type="button" class="btn-ghost" id="btnClear">Clear week</button>
+      <button type="button" class="btn-ghost" id="btnClose">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- In-page dialog, used instead of the browser's alert/confirm pop-ups -->
+<dialog class="ui-dialog" id="uiDialog" aria-labelledby="uiDialogTitle">
+  <h2 id="uiDialogTitle">Notice</h2>
+  <div class="ui-dialog-body" id="uiDialogBody"></div>
+  <div class="ui-dialog-actions">
+    <button type="button" class="btn-ghost" id="uiDialogCancel">Cancel</button>
+    <button type="button" class="btn-primary" id="uiDialogOk">OK</button>
+  </div>
+</dialog>
+
+<!-- "Done — Undo" bar shown after clearing a week or deleting a placement entry -->
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span id="toastText"></span>
+  <button type="button" id="toastUndo">Undo</button>
+</div>
+
+<div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<!-- PWA install prompt — shown when the browser offers installation -->
+<div class="install-banner" id="installBanner" hidden>
+  <span>Install as an app on this device</span>
+  <button type="button" class="install-btn" id="installBtn">Install</button>
+  <button type="button" class="install-dismiss" id="installDismiss" aria-label="Dismiss">✕</button>
+</div>
+
+<script>
+// ── Service worker (offline support) ──
+// updateViaCache 'none': always check sw.js itself for a new version, never a cached copy.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+  });
+}
+
+// ── Install prompt ──
+let deferredPrompt = null;
+const installBanner  = document.getElementById('installBanner');
+const installBtn     = document.getElementById('installBtn');
+const installDismiss = document.getElementById('installDismiss');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBanner.hidden = false;
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBanner.hidden = true;
+});
+
+installDismiss.addEventListener('click', () => { installBanner.hidden = true; });
+
+window.addEventListener('appinstalled', () => {
+  installBanner.hidden = true;
+  deferredPrompt = null;
+});
+</script>
+
+<script src="calendar.js"></script>
+<script src="data.js"></script>
+<script>
+// ﹏𓊝﹏ Academic Life Tracker — made by Arush Giri
+const SIGN = '﹏𓊝﹏';
+console.log('%c' + SIGN, 'font-size:20px;letter-spacing:4px;',
+  '\nAcademic Life Tracker — made by Arush Giri');
+
+const {
+  PRESET_NAMES, pd, ds, presetLayout, defaultPeriodsForYear,
+  buildWeeks, giForDate, validateCustomPeriods, validateCustomPeriodYears, validateOverrides, periodsWithoutWeeks,
+} = Calendar;
+const {
+  padArray, sanitizeScores, sanitizeNotes, sanitizeOverrides, sanitizeCustomPeriods,
+  sanitizePeriodNames, sanitizePlacementEvents, migrateLegacyEntries,
+} = TrackerData;
+
+// ─────────────────────────────────────────────
+// STORAGE KEYS
+// The _v5 / _v6 suffixes are part of the saved key names, so they stay as they are.
+// ─────────────────────────────────────────────
+const KEY_START           = 'ugt_start_v5';           // 'YYYY-MM-DD'
+const KEY_YEARS           = 'ugt_years_v5';           // 2–6
+const KEY_CALENDAR_PRESET = 'ugt_calendar_preset_v5'; // 'semester' | 'trimester' | 'annual'
+const KEY_OVERRIDES       = 'ugt_overrides_v5';       // per year: { '<slot>_s': date, '<slot>_e': date }
+const KEY_PERIOD_NAMES    = 'ugt_period_names_v5';    // { '<slot>': 'New name' }, all years
+const KEY_CUSTOM          = 'ugt_custom_periods_v5';  // per year: [{ name, kind, start, end }]
+const KEY_SCORES          = 'ugt_scores_v6';          // { 'YYYY-MM-DD': 1–5 }, date = any day of the week
+const KEY_NOTES           = 'ugt_notes_v6';           // { 'YYYY-MM-DD': { note, tags[] } }
+const KEY_PLACEMENT       = 'ugt_placement_v5';       // [{ id, company, stage, date, note }]
+const KEY_PLACEMENT_MODE  = 'ugt_placement_mode_v7';  // 'auto' | 'on' | 'off' — when the tracker is shown
+const KEY_LAST_BACKUP     = 'ugt_last_backup_v6';     // ISO time of the last export from this browser
+const KEY_SCORES_LEGACY   = 'ugt_scores_v5';          // pre-v6, keyed by week number; migrated on load
+const KEY_NOTES_LEGACY    = 'ugt_notes_v5';
+const KEY_LEGACY_ARCHIVE  = 'ugt_v5_archive';         // untouched copy of the pre-v6 data
+const KEY_THEME           = 'ugt_theme_v5';           // 'light' | 'dark' (a setting, not data)
+const KEY_NOTIFY          = 'ugt_notify_v5';          // retired setting; only cleared on reset
+
+// Everything that's the user's data — what Import replaces and Reset deletes.
+const ALL_DATA_KEYS = [KEY_START, KEY_YEARS, KEY_CALENDAR_PRESET, KEY_OVERRIDES, KEY_PERIOD_NAMES,
+  KEY_CUSTOM, KEY_SCORES, KEY_NOTES, KEY_PLACEMENT, KEY_PLACEMENT_MODE, KEY_LAST_BACKUP,
+  KEY_SCORES_LEGACY, KEY_NOTES_LEGACY, KEY_LEGACY_ARCHIVE];
+
+const SUGGESTED_TAGS = ['exam','sick','travel','internship','placement','thesis','fest','family','hostel','project','burnout'];
+
+// localStorage can throw (blocked storage, private modes, full quota). These never do:
+// reads fall back to null, writes are skipped.
+function readStr(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function readJSON(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
+function writeStr(key, val) { try { localStorage.setItem(key, val); } catch(e) { /* blocked or full: skip */ } }
+function writeJSON(key, val) { writeStr(key, JSON.stringify(val)); }
+function removeKey(key) { try { localStorage.removeItem(key); } catch(e) { /* blocked: nothing to remove */ } }
+
+// ─────────────────────────────────────────────
+// DISPLAY DATES
+// ─────────────────────────────────────────────
+function today() {
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
+function fmt(d) {
+  return d ? d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+}
+function fmtMo(d) {
+  return d ? d.toLocaleDateString('en-IN', { month: 'short' }) : '';
+}
+
+// ─────────────────────────────────────────────
+// STATE — loaded from storage, cleaned by data.js
+// ─────────────────────────────────────────────
+let programYears    = 4;
+let calendarPreset  = 'semester';
+let overrides       = [];  // see KEY_OVERRIDES
+let periodNames     = {};  // see KEY_PERIOD_NAMES
+let customPeriods   = [];  // see KEY_CUSTOM
+let scores          = {};  // see KEY_SCORES
+let notesTags       = {};  // see KEY_NOTES
+let placementEvents = [];  // see KEY_PLACEMENT — matched to weeks by date when drawn
+let placementMode   = 'auto'; // see KEY_PLACEMENT_MODE
+let weekData        = [];  // the built calendar: one entry per week (calendar.js buildWeeks)
+let editingPlacementId = null; // placement entry being edited in the form, if any
+
+const PLACEMENT_STAGE_LABELS = { applied: 'Applied', oa: 'OA / Test', interview: 'Interview', offer: 'Offer', rejected: 'Rejected' };
+
+function emptyPerYear(makeBlank) { return Array.from({ length: programYears }, makeBlank); }
+
+function loadAll() {
+  const y = parseInt(readStr(KEY_YEARS), 10);
+  programYears = (y >= 2 && y <= 6) ? y : 4;
+  const preset = readStr(KEY_CALENDAR_PRESET);
+  calendarPreset = PRESET_NAMES.includes(preset) ? preset : 'semester';
+
+  overrides       = padArray(sanitizeOverrides(readJSON(KEY_OVERRIDES)), programYears, () => ({}));
+  customPeriods   = padArray(sanitizeCustomPeriods(readJSON(KEY_CUSTOM)), programYears, () => []);
+  periodNames     = sanitizePeriodNames(readJSON(KEY_PERIOD_NAMES));
+  scores          = sanitizeScores(readJSON(KEY_SCORES));
+  notesTags       = sanitizeNotes(readJSON(KEY_NOTES));
+  placementEvents = sanitizePlacementEvents(readJSON(KEY_PLACEMENT));
+  const pm = readStr(KEY_PLACEMENT_MODE);
+  placementMode   = ['auto', 'on', 'off'].includes(pm) ? pm : 'auto';
+}
+function saveScores()          { writeJSON(KEY_SCORES, scores); }
+function saveNotesTags()       { writeJSON(KEY_NOTES, notesTags); }
+function saveOverrides()       { writeJSON(KEY_OVERRIDES, overrides); }
+function savePeriodNames()     { writeJSON(KEY_PERIOD_NAMES, periodNames); }
+function saveCustomPeriods()   { writeJSON(KEY_CUSTOM, customPeriods); }
+function saveProgramYears()    { writeStr(KEY_YEARS, String(programYears)); }
+function saveCalendarPreset()  { writeStr(KEY_CALENDAR_PRESET, calendarPreset); }
+function savePlacementEvents() { writeJSON(KEY_PLACEMENT, placementEvents); }
+
+loadAll();
+
+// Rebuilds the calendar from the current settings (empty if no start date yet).
+function rebuildWeeks() {
+  const s = pd(readStr(KEY_START));
+  weekData = s ? buildWeeks(s, overrides, programYears, customPeriods, periodNames, calendarPreset) : [];
+}
+
+// ─────────────────────────────────────────────
+// WEEK ↔ STORED SCORES AND NOTES
+// Entries are stored under a date (see weekAnchorKey in calendar.js) and belong to whichever
+// week contains that date, so changing the calendar never moves them to a different week.
+// ─────────────────────────────────────────────
+let weekKeys = []; // weekKeys[gi] = stored keys inside week gi (normally 0 or 1)
+
+function indexWeekKeys() {
+  weekKeys = weekData.map(() => []);
+  new Set([...Object.keys(scores), ...Object.keys(notesTags)]).forEach(k => {
+    const gi = giForDate(weekData, pd(k));
+    if (gi >= 0) weekKeys[gi].push(k);
+  });
+}
+function scoreAt(gi) {
+  for (const k of weekKeys[gi] || []) if (scores[k]) return scores[k];
+  return undefined;
+}
+function metaAt(gi) {
+  for (const k of weekKeys[gi] || []) if (notesTags[k]) return notesTags[k];
+  return undefined;
+}
+
+// Replaces whatever week gi had with one entry under the week's current key. Entries
+// outside the calendar (e.g. in years hidden by shortening the program) are never touched.
+function setWeekEntry(gi, score, meta) {
+  (weekKeys[gi] || []).forEach(k => { delete scores[k]; delete notesTags[k]; });
+  const key = weekData[gi].key;
+  if (score) scores[key] = score;
+  if (meta) notesTags[key] = meta;
+  weekKeys[gi] = (score || meta) ? [key] : [];
+}
+
+// One-time conversion of pre-v6 data (keyed by week number), against the calendar as it's
+// set up now. The original is kept under KEY_LEGACY_ARCHIVE in case it's ever needed.
+function migrateLegacyWeekData() {
+  if (!weekData.length) return;
+  const rawScores = readJSON(KEY_SCORES_LEGACY), rawNotes = readJSON(KEY_NOTES_LEGACY);
+  if (!rawScores && !rawNotes) return;
+  const migrated = migrateLegacyEntries(weekData[0].weekStart, rawScores, rawNotes);
+  Object.entries(migrated.scores).forEach(([k, v]) => { if (!scores[k]) scores[k] = v; });
+  Object.entries(migrated.notes).forEach(([k, m]) => { if (!notesTags[k]) notesTags[k] = m; });
+  writeJSON(KEY_LEGACY_ARCHIVE, { migratedAt: new Date().toISOString(), scores: rawScores, notesTags: rawNotes });
+  saveScores(); saveNotesTags();
+  removeKey(KEY_SCORES_LEGACY); removeKey(KEY_NOTES_LEGACY);
+}
+
+// ─────────────────────────────────────────────
+// THEME
+// ─────────────────────────────────────────────
+// Until someone uses the toggle, the theme follows the device's light/dark setting (live,
+// if it changes). Once they pick one, that choice is remembered and wins.
+const deviceDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme(theme, remember) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeToggle');
+  btn.textContent = theme === 'dark' ? '☀' : '🌙';
+  btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  const meta = document.getElementById('themeColorMeta');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#15120e' : '#f7f4ef');
+  if (remember) writeStr(KEY_THEME, theme);
+}
+function savedTheme() { const t = readStr(KEY_THEME); return (t === 'light' || t === 'dark') ? t : null; }
+
+applyTheme(savedTheme() || (deviceDark.matches ? 'dark' : 'light'), false);
+deviceDark.addEventListener('change', e => { if (!savedTheme()) applyTheme(e.matches ? 'dark' : 'light', false); });
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  applyTheme(cur === 'dark' ? 'light' : 'dark', true);
+});
+
+// ─────────────────────────────────────────────
+// DIALOGS AND UNDO
+// In-page replacements for alert()/confirm(), which look out of place (especially on phones)
+// and can't be styled. Both return promises: `if (!(await uiConfirm(...))) return;`
+// ─────────────────────────────────────────────
+const uiDialogEl = document.getElementById('uiDialog');
+
+// message: a string (blank lines start new paragraphs); list: optional bullet points.
+function uiDialog({ title, message = '', list = [], okText = 'OK', cancelText = null, danger = false }) {
+  return new Promise(resolve => {
+    document.getElementById('uiDialogTitle').textContent = title;
+    const body = document.getElementById('uiDialogBody');
+    body.innerHTML = '';
+    String(message).split(/\n\s*\n/).filter(Boolean).forEach(par => body.append(el('p', { textContent: par })));
+    if (list.length) body.append(el('ul', {}, list.map(item => el('li', { textContent: item }))));
+
+    const ok = document.getElementById('uiDialogOk');
+    const cancel = document.getElementById('uiDialogCancel');
+    ok.textContent = okText;
+    ok.classList.toggle('danger', danger);
+    cancel.hidden = !cancelText;
+    if (cancelText) cancel.textContent = cancelText;
+
+    const finish = result => {
+      ok.onclick = cancel.onclick = uiDialogEl.oncancel = null;
+      if (uiDialogEl.open) uiDialogEl.close();
+      resolve(result);
+    };
+    ok.onclick = () => finish(true);
+    cancel.onclick = () => finish(false);
+    uiDialogEl.oncancel = e => { e.preventDefault(); finish(false); }; // Escape key
+    uiDialogEl.showModal();
+    (danger && cancelText ? cancel : ok).focus(); // risky actions start on the safe button
+  });
+}
+function uiAlert(title, message, list) { return uiDialog({ title, message, list }); }
+function uiConfirm(title, message, opts) {
+  return uiDialog({ title, message, okText: 'Continue', cancelText: 'Cancel', ...(opts || {}) });
+}
+
+// Shows "<text>  [Undo]" for 8 seconds. Starting a new one drops the previous undo.
+const toastEl = document.getElementById('toast');
+let toastTimer = null, toastUndo = null;
+function showUndoToast(text, undo) {
+  document.getElementById('toastText').textContent = text;
+  document.getElementById('toastUndo').hidden = !undo;
+  toastUndo = undo;
+  toastEl.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 8000);
+}
+function hideToast() { toastEl.hidden = true; toastUndo = null; clearTimeout(toastTimer); }
+document.getElementById('toastUndo').addEventListener('click', () => {
+  const undo = toastUndo;
+  hideToast();
+  if (undo) undo();
+});
+
+// ─────────────────────────────────────────────
+// ADVANCED PANEL — per-year date overrides, renames, and custom periods
+// Works the same for every calendar type: each type's periods have stable slot ids
+// (calendar.js PRESETS), and overrides/renames are stored by slot.
+// ─────────────────────────────────────────────
+const advGrid = document.getElementById('advGrid');
+const advDateInputs = [];       // advDateInputs[yi]['<slot>_s' | '<slot>_e'] = <input type=date>
+const advCustomContainers = []; // advCustomContainers[yi] = the year's list of custom period rows
+const ADV_TOGGLE_LABEL = '⚙ Adjust term dates & names';
+
+function el(tag, props, children) {
+  const node = Object.assign(document.createElement(tag), props || {});
+  (children || []).forEach(c => node.append(c));
+  return node;
+}
+
+function createCustomPeriodRow(data) {
+  data = data || { name: '', kind: 'sem', start: '', end: '' };
+  const row = el('div', { className: 'adv-custom-row' });
+
+  const nameInp = el('input', { type: 'text', placeholder: 'Name (e.g. Study Abroad)', maxLength: 30, value: data.name || '' });
+  nameInp.dataset.field = 'name';
+  nameInp.setAttribute('aria-label', 'Custom period name');
+
+  const kindSel = el('select');
+  kindSel.dataset.field = 'kind';
+  kindSel.setAttribute('aria-label', 'Custom period type — term or break');
+  [['sem', 'Term'], ['break', 'Break']].forEach(([value, label]) => {
+    kindSel.append(el('option', { value, textContent: label, selected: (data.kind || 'sem') === value }));
+  });
+
+  const startInp = el('input', { type: 'date', value: data.start || '' });
+  startInp.dataset.field = 'start';
+  startInp.setAttribute('aria-label', 'Custom period start date');
+  const endInp = el('input', { type: 'date', value: data.end || '' });
+  endInp.dataset.field = 'end';
+  endInp.setAttribute('aria-label', 'Custom period end date');
+
+  const removeBtn = el('button', { type: 'button', className: 'adv-custom-remove', title: 'Remove this period', textContent: '✕' });
+  removeBtn.setAttribute('aria-label', 'Remove this period');
+  removeBtn.addEventListener('click', () => row.remove());
+
+  row.append(nameInp, kindSel, startInp, el('span', { className: 'sep', textContent: '→' }), endInp, removeBtn);
+  return row;
+}
+
+function buildAdvPanel() {
+  const layout = presetLayout(calendarPreset);
+  const programStart = pd(readStr(KEY_START));
+
+  // Renames apply to every year.
+  const renameRow = document.getElementById('advRenameRow');
+  renameRow.innerHTML = '';
+  layout.forEach(p => {
+    const inp = el('input', { type: 'text', id: `rename-${p.slot}`, maxLength: 24, placeholder: p.name, value: periodNames[p.slot] || '' });
+    inp.dataset.renameKey = p.slot;
+    renameRow.append(el('div', { className: 'adv-rename-item' }, [
+      el('label', { htmlFor: `rename-${p.slot}`, textContent: p.name }), inp,
+    ]));
+  });
+
+  advGrid.innerHTML = '';
+  advDateInputs.length = 0;
+  advCustomContainers.length = 0;
+
+  for (let yi = 0; yi < programYears; yi++) {
+    advDateInputs[yi] = {};
+    const card = el('div', { className: 'adv-year' }, [el('h3', { textContent: `Year ${yi + 1}` })]);
+    const defaults = programStart ? defaultPeriodsForYear(programStart, yi, calendarPreset) : null;
+
+    layout.forEach((p, pi) => {
+      const pair = el('div', { className: 'adv-pair' });
+      ['_s', '_e'].forEach((suffix, ki) => {
+        if (ki === 1) pair.append(el('span', { className: 'sep', textContent: '→' }));
+        const key = p.slot + suffix;
+        const inp = el('input', { type: 'date', value: overrides[yi][key] || '' });
+        inp.setAttribute('aria-label', `Year ${yi + 1} ${p.name} ${ki ? 'end' : 'start'} date (blank = automatic)`);
+        pair.append(inp);
+        advDateInputs[yi][key] = inp;
+      });
+      const row = el('div', { className: 'adv-row' }, [
+        el('div', { className: 'adv-label', textContent: (periodNames[p.slot] || '').trim() || p.name }),
+        pair,
+      ]);
+      // Blank date fields show nothing, so say what "automatic" currently means.
+      if (defaults) {
+        row.append(el('span', { className: 'adv-default', textContent: `auto: ${fmt(defaults[pi].start)} – ${fmt(defaults[pi].end)}` }));
+      }
+      card.append(row);
+    });
+
+    const customList = el('div', { className: 'adv-custom-list' });
+    (customPeriods[yi] || []).forEach(cp => customList.append(createCustomPeriodRow(cp)));
+    advCustomContainers[yi] = customList;
+    const addBtn = el('button', { type: 'button', className: 'adv-add-period', textContent: '+ Add your own period' });
+    addBtn.addEventListener('click', () => customList.append(createCustomPeriodRow(null)));
+    card.append(customList, addBtn);
+
+    advGrid.append(card);
+  }
+}
+
+// The panel only shows the current calendar type's slots. Other types' saved overrides and
+// renames are kept, so switching type and back doesn't lose them.
+function readAdvOverrides() {
+  return Array.from({ length: programYears }, (_, yi) => {
+    const yr = { ...(overrides[yi] || {}) };
+    Object.entries(advDateInputs[yi] || {}).forEach(([key, inp]) => {
+      if (inp.value) yr[key] = inp.value; else delete yr[key];
+    });
+    return yr;
+  });
+}
+
+function readPeriodNamesFromPanel() {
+  const result = { ...periodNames };
+  document.querySelectorAll('#advRenameRow input[data-rename-key]').forEach(inp => {
+    result[inp.dataset.renameKey] = inp.value.trim().slice(0, 24);
+  });
+  return result;
+}
+
+function readCustomPeriodsFromPanel() {
+  return Array.from({ length: programYears }, (_, yi) => {
+    const container = advCustomContainers[yi];
+    if (!container) return [];
+    return Array.from(container.querySelectorAll('.adv-custom-row'))
+      .map(row => ({
+        name:  row.querySelector('[data-field="name"]').value.trim().slice(0, 30),
+        kind:  row.querySelector('[data-field="kind"]').value,
+        start: row.querySelector('[data-field="start"]').value,
+        end:   row.querySelector('[data-field="end"]').value,
+      }))
+      .filter(c => c.name || c.start || c.end); // skip rows left completely empty
+  });
+}
+
+const advPanel     = document.getElementById('advPanel');
+const advToggleBtn = document.getElementById('advToggleBtn');
+let advOpen = false;
+
+function setAdvOpen(open) {
+  advOpen = open;
+  advPanel.classList.toggle('open', open);
+  advToggleBtn.textContent = open ? '✕ Close' : ADV_TOGGLE_LABEL;
+}
+advToggleBtn.addEventListener('click', () => setAdvOpen(!advOpen));
+
+document.getElementById('btnAdvSave').addEventListener('click', async () => {
+  const newOverrides = readAdvOverrides();
+  const newCustom = readCustomPeriodsFromPanel();
+  const newPeriodNames = readPeriodNamesFromPanel();
+  const startStr = readStr(KEY_START);
+
+  const problems = [
+    ...validateCustomPeriods(newCustom),
+    ...validateCustomPeriodYears(startStr, newOverrides, programYears, newCustom, newPeriodNames, calendarPreset),
+    ...validateOverrides(startStr, newOverrides, programYears, newCustom, newPeriodNames, calendarPreset),
+  ];
+  if (problems.length) {
+    await uiAlert('Check these dates', 'Some of these dates don\'t look right, so nothing was saved:', problems);
+    return;
+  }
+
+  const programStart = pd(startStr);
+  if (programStart) {
+    const preview = buildWeeks(programStart, newOverrides, programYears, newCustom, newPeriodNames, calendarPreset);
+    const missing = periodsWithoutWeeks(preview, newCustom);
+    if (missing.length) {
+      const weekday = preview[0].weekStart.toLocaleDateString('en-IN', { weekday: 'long' });
+      const go = await uiDialog({
+        title: 'Some periods won\'t show',
+        message: `Each week starts on a ${weekday}, and these periods don't include one, so they won't appear on the grid. Make them longer, or start them on a ${weekday}:`,
+        list: missing.map(m => `Year ${m.yi + 1} "${m.name}" (${fmt(m.start)} – ${fmt(m.end)})`),
+        okText: 'Save anyway', cancelText: 'Go back',
+      });
+      if (!go) return;
+    }
+  }
+
+  overrides = newOverrides;
+  periodNames = newPeriodNames;
+  customPeriods = newCustom;
+  saveOverrides(); savePeriodNames(); saveCustomPeriods();
+  rebuildWeeks();
+  buildAdvPanel();
+  renderGrid();
+  setAdvOpen(false);
+});
+
+document.getElementById('btnAdvClear').addEventListener('click', async () => {
+  if (!(await uiConfirm('Clear all changes?',
+    'This removes every date you entered, every custom period and every renamed period, and goes back to the automatic calendar. Your scores and notes are not affected.\n\nThis can\'t be undone.',
+    { okText: 'Clear changes', danger: true }))) return;
+  overrides = emptyPerYear(() => ({}));
+  customPeriods = emptyPerYear(() => []);
+  periodNames = sanitizePeriodNames(null);
+  saveOverrides(); saveCustomPeriods(); savePeriodNames();
+  rebuildWeeks();
+  buildAdvPanel();
+  renderGrid();
+});
+
+// ─────────────────────────────────────────────
+// GRID
+// ─────────────────────────────────────────────
+let weekEls = [];
+
+const gridEl  = document.getElementById('grid');
+const tooltip = document.getElementById('tooltip');
+
+// Tooltip — for mouse/pen hover and keyboard focus only. On touch screens a tap opens the
+// score modal, which shows the same details, so the tooltip would only get stuck on screen.
+let lastInput = 'mouse'; // 'mouse' | 'pen' | 'touch' | 'keyboard'
+document.addEventListener('pointerdown', e => { lastInput = e.pointerType || 'mouse'; }, true);
+document.addEventListener('keydown', () => { lastInput = 'keyboard'; }, true);
+
+let tooltipFollowsMouse = false;
+function placeTooltip(x, y) {
+  const r = tooltip.getBoundingClientRect(), m = 8;
+  let left = x + 14, top = y - r.height - 10;
+  if (left + r.width > window.innerWidth - m) left = x - r.width - 14; // flip to the left side
+  left = Math.max(m, left);
+  if (top < m) top = y + 20; // no room above — show below
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top + 'px';
+}
+function showTooltip(text, x, y, followMouse) {
+  tooltip.textContent = text;
+  tooltipFollowsMouse = followMouse;
+  placeTooltip(x, y);
+  tooltip.style.opacity = '1';
+}
+function hideTooltip() { tooltip.style.opacity = '0'; tooltipFollowsMouse = false; }
+document.addEventListener('mousemove', e => { if (tooltipFollowsMouse) placeTooltip(e.clientX, e.clientY); });
+// A keyboard-focus tooltip is pinned to its square, so it would drift away on scroll; a mouse
+// tooltip just follows the pointer (and pointerleave hides it when the square moves away).
+window.addEventListener('scroll', () => { if (!tooltipFollowsMouse) hideTooltip(); }, { passive: true });
+
+function currentGi() {
+  const tod = today();
+  for (let i = 0; i < weekData.length; i++) {
+    if (tod >= weekData[i].weekStart && tod <= weekData[i].weekEnd) return i;
+  }
+  return -1;
+}
+
+function renderGrid() {
+  gridEl.innerHTML = '';
+  weekEls = [];
+  indexWeekKeys(); // weekData may have just been rebuilt — re-match stored entries to weeks
+
+  if (!weekData.length) {
+    gridEl.innerHTML = '<div class="grid-empty">Enter your start date above and click <strong class="accent">Build my calendar</strong><div class="grid-empty-sign" aria-hidden="true">﹏𓊝﹏</div></div>';
+    updateCwBar(-1); updateStats(); updateNudgeBanner(-1); updateInsights();
+    renderPlacementPanel();
+    updatePlacementVisibility();
+    updateBackupNote();
+    return;
+  }
+
+  const cgi = currentGi();
+  const placementGiMap = placementsVisible() ? computePlacementGiMap() : new Map();
+
+  Array.from({length: programYears}, (_, i) => i + 1).forEach(y => {
+    const yWeeks = weekData.filter(w => w.year === y);
+    if (!yWeeks.length) return;
+
+    const yBlock = document.createElement('div');
+    yBlock.className = 'year-block';
+
+    const yl = document.createElement('div');
+    yl.className = 'year-label';
+    yl.textContent = `— Year ${y}  ·  ${yWeeks[0].weekStart.getFullYear()}–${yWeeks[yWeeks.length-1].weekEnd.getFullYear()} —`;
+    yBlock.appendChild(yl);
+
+    // One row per run of consecutive weeks in the same period
+    const runs = [];
+    yWeeks.forEach(wd => {
+      if (!runs.length || runs[runs.length-1].name !== wd.periodName) {
+        runs.push({ name: wd.periodName, kind: wd.kind, weeks: [] });
+      }
+      runs[runs.length-1].weeks.push(wd);
+    });
+
+    runs.forEach(run => {
+      const row = document.createElement('div');
+      row.className = 'block-row';
+
+      const rl = document.createElement('div');
+      rl.className = 'row-label';
+      const mo1 = fmtMo(run.weeks[0].weekStart);
+      const mo2 = fmtMo(run.weeks[run.weeks.length-1].weekEnd);
+      // Period names are user text (renames, custom periods): textContent only, never innerHTML.
+      rl.appendChild(document.createTextNode(run.name));
+      const rlDates = document.createElement('small');
+      rlDates.textContent = mo1 === mo2 ? mo1 : `${mo1}–${mo2}`;
+      rl.appendChild(rlDates);
+      row.appendChild(rl);
+
+      const wr = document.createElement('div');
+      wr.className = 'weeks-row';
+
+      run.weeks.forEach(wd => {
+        const gi = wd.gi;
+        const sq = document.createElement('div');
+        sq.className = 'week';
+        sq.style.setProperty('--i', gi); // for the ﹏𓊝﹏ wave
+
+        // By date, so it still works after the program ends (when there's no current week).
+        const isPast    = today() > wd.weekEnd;
+        const isCurrent = gi === cgi;
+        const sc        = scoreAt(gi);
+        const meta      = metaAt(gi);
+        const hasMeta   = meta && (meta.note || (meta.tags && meta.tags.length));
+
+        if (isCurrent) {
+          if (sc) { sq.classList.add(`p${sc}`, 'now-scored'); }
+          else    { sq.classList.add('now'); }
+          sq.classList.add('clickable');
+          sq.addEventListener('click', () => openModal(gi));
+        } else if (isPast) {
+          sq.classList.add(sc ? `p${sc}` : (wd.kind === 'break' ? 'brkblank' : 'blank'));
+          sq.classList.add('clickable');
+          sq.addEventListener('click', () => openModal(gi));
+        } else {
+          sq.classList.add(wd.kind === 'break' ? 'brkblank' : 'blank');
+        }
+
+        if (sc) {
+          const digit = document.createElement('span');
+          digit.className = 'week-digit';
+          digit.textContent = sc;
+          sq.appendChild(digit);
+        }
+        if (hasMeta) {
+          const dot = document.createElement('span');
+          dot.className = 'week-note-dot';
+          sq.appendChild(dot);
+        }
+        const placementForWeek = placementGiMap.get(gi);
+        if (placementForWeek && placementForWeek.length) {
+          const pdot = document.createElement('span');
+          pdot.className = 'week-placement-dot';
+          sq.appendChild(pdot);
+        }
+
+        // Tooltip / aria-label
+        let tip = `${wd.periodName} · Y${wd.year} Wk${wd.weekInPeriod} · ${fmt(wd.weekStart)}`;
+        if (isCurrent) tip += '  ← you are here';
+        if (isPast || isCurrent) tip += sc ? `  · Score: ${sc}/5` : '  · click to score';
+        if (hasMeta) {
+          if (meta.tags && meta.tags.length) tip += `  · #${meta.tags.join(' #')}`;
+          if (meta.note) tip += `  · “${meta.note.length > 70 ? meta.note.slice(0, 70) + '…' : meta.note}”`;
+        }
+        if (placementForWeek && placementForWeek.length) {
+          tip += '  · 🎯 ' + placementForWeek.map(ev => `${ev.company} (${PLACEMENT_STAGE_LABELS[ev.stage] || ev.stage})`).join(', ');
+        }
+
+        if (sq.classList.contains('clickable')) {
+          sq.tabIndex = 0;
+          sq.setAttribute('role', 'button');
+          sq.setAttribute('aria-label', tip);
+          sq.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(gi); }
+          });
+        }
+
+        sq.addEventListener('pointerenter', e => {
+          if (e.pointerType !== 'touch') showTooltip(tip, e.clientX, e.clientY, true);
+        });
+        sq.addEventListener('pointerleave', hideTooltip);
+        sq.addEventListener('focus', () => {
+          if (lastInput !== 'keyboard') return; // e.g. focus returned after closing the modal on a phone
+          const r = sq.getBoundingClientRect();
+          showTooltip(tip, r.right, r.top, false);
+        });
+        sq.addEventListener('blur', hideTooltip);
+
+        wr.appendChild(sq);
+        weekEls[gi] = sq;
+      });
+
+      row.appendChild(wr);
+      yBlock.appendChild(row);
+    });
+
+    gridEl.appendChild(yBlock);
+  });
+
+  updateCwBar(cgi);
+  updateStats();
+  updateNudgeBanner(cgi);
+  updateInsights();
+  applyGridFilter();
+  renderPlacementPanel();
+  updatePlacementVisibility();
+  updateBackupNote();
+}
+
+function updateCwBar(cgi) {
+  document.getElementById('cwToday').textContent = fmt(today());
+  if (!weekData.length) {
+    document.getElementById('cwTitle').textContent  = '—';
+    document.getElementById('cwDetail').textContent = 'Enter your start date above to begin';
+    document.getElementById('cwOverall').textContent = '';
+    return;
+  }
+  const tod = today();
+  if (cgi < 0) {
+    if (tod < weekData[0].weekStart) {
+      document.getElementById('cwTitle').textContent  = 'Before your program begins';
+      document.getElementById('cwDetail').textContent = 'Starting ' + fmt(weekData[0].weekStart);
+    } else {
+      document.getElementById('cwTitle').textContent  = 'Program Complete';
+      document.getElementById('cwDetail').textContent = 'All ' + weekData.length + ' weeks done.';
+    }
+    document.getElementById('cwOverall').textContent = '';
+    return;
+  }
+  const wd = weekData[cgi];
+  const periodTotal = weekData.filter(w => w.periodName === wd.periodName && w.year === wd.year).length;
+  document.getElementById('cwTitle').textContent   = wd.periodName;
+  document.getElementById('cwDetail').textContent  = `Year ${wd.year} · Week ${wd.weekInPeriod} of ${periodTotal}`;
+  document.getElementById('cwOverall').textContent = `Overall week ${cgi + 1} of ${weekData.length}`;
+}
+
+function updateStats() {
+  if (!weekData.length) {
+    ['st-gone','st-scored','st-avg','st-left'].forEach(id => document.getElementById(id).textContent = '—');
+    return;
+  }
+  const tod = today();
+  if (tod < weekData[0].weekStart) {
+    ['st-gone','st-scored','st-avg','st-left'].forEach(id => document.getElementById(id).textContent = '—');
+    return;
+  }
+  let gone = 0, scored = 0, sum = 0, left = 0;
+  weekData.forEach((wd, i) => {
+    if (wd.weekEnd < tod) {
+      gone++;
+      if (scoreAt(i)) { scored++; sum += scoreAt(i); }
+    } else if (wd.weekStart > tod) {
+      left++;
+    } else if (scoreAt(i)) {
+      // this week: neither elapsed nor remaining, but its score counts
+      scored++; sum += scoreAt(i);
+    }
+  });
+  document.getElementById('st-gone').textContent   = gone;
+  document.getElementById('st-scored').textContent = scored;
+  document.getElementById('st-avg').textContent    = scored > 0 ? (sum / scored).toFixed(1) : '—';
+  document.getElementById('st-left').textContent   = left;
+}
+
+// ─────────────────────────────────────────────
+// NUDGE BANNER — surface unscored past/current weeks
+// ─────────────────────────────────────────────
+const nudgeBanner   = document.getElementById('nudgeBanner');
+const nudgeText     = document.getElementById('nudgeText');
+const btnScoreNext  = document.getElementById('btnScoreNext');
+let nudgeTargetGi = -1;
+
+// The weekly habit is "score the week that just ended", so the button jumps straight to the
+// most recent unscored week that's over (usually last week), or this week if all past ones are done.
+// Scoring always works backwards from there, so a long unscored stretch never sends you to week 1.
+function pickNudgeTarget(cgi) {
+  const tod = today();
+  for (let i = weekData.length - 1; i >= 0; i--) {
+    if (weekData[i].weekEnd < tod && !scoreAt(i)) return i;
+  }
+  return (cgi >= 0 && !scoreAt(cgi)) ? cgi : -1;
+}
+
+function updateNudgeBanner(cgi) {
+  if (!weekData.length) { nudgeBanner.classList.remove('show'); return; }
+  const tod = today();
+  if (tod < weekData[0].weekStart) { nudgeBanner.classList.remove('show'); return; }
+  let unscored = 0, currentUnscored = false;
+  weekData.forEach((wd, i) => {
+    if (wd.weekStart <= tod && !scoreAt(i)) { unscored++; if (i === cgi) currentUnscored = true; }
+  });
+  if (unscored > 0) {
+    nudgeText.innerHTML = `You have <strong>${unscored}</strong> unscored week${unscored === 1 ? '' : 's'}${currentUnscored ? ' (including this one)' : ''}.`;
+    nudgeTargetGi = pickNudgeTarget(cgi);
+    btnScoreNext.textContent =
+      nudgeTargetGi === cgi       ? 'Score this week →' :
+      nudgeTargetGi === cgi - 1 && cgi > 0 ? 'Score last week →' :
+      `Score week of ${fmt(weekData[nudgeTargetGi].weekStart)} →`;
+    nudgeBanner.classList.add('show');
+  } else {
+    nudgeBanner.classList.remove('show');
+  }
+}
+btnScoreNext.addEventListener('click', () => { if (nudgeTargetGi >= 0) openModal(nudgeTargetGi); });
+
+// ─────────────────────────────────────────────
+// INSIGHTS — trends, streaks, term vs break, best/worst week
+// ─────────────────────────────────────────────
+const insightPanel     = document.getElementById('insightPanel');
+const insightToggleBtn = document.getElementById('insightToggleBtn');
+const insightBody      = document.getElementById('insightBody');
+let insightOpen = false;
+
+insightToggleBtn.addEventListener('click', () => {
+  insightOpen = !insightOpen;
+  insightPanel.classList.toggle('open', insightOpen);
+  insightToggleBtn.textContent = insightOpen ? '✕ Hide insights' : '📊 Show insights';
+});
+
+function svgEl(w, h, inner) {
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+// Notes, tags and names can come from an imported file, so escape them before any innerHTML.
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function computeInsights() {
+  const scoredEntries = weekData.filter(wd => scoreAt(wd.gi)).map(wd => wd.gi);
+
+  if (!scoredEntries.length) return null;
+
+  let termSum = 0, termN = 0, brkSum = 0, brkN = 0;
+  let best = null, worst = null;
+
+  scoredEntries.forEach(gi => {
+    const wd = weekData[gi], sc = scoreAt(gi);
+    if (wd.kind === 'break') { brkSum += sc; brkN++; } else { termSum += sc; termN++; }
+    // `=== null`, not `!best` — week 0 is a valid index.
+    if (best === null || sc > scoreAt(best) || (sc === scoreAt(best) && gi > best)) best = gi;
+    if (worst === null || sc < scoreAt(worst) || (sc === scoreAt(worst) && gi > worst)) worst = gi;
+  });
+
+  // Consecutive calendar weeks scored ≥4. An unscored week breaks the streak like a low
+  // score does — skipping gaps would overstate consistency.
+  let curStreak = 0, bestStreak = 0;
+  const maxGi = scoredEntries[scoredEntries.length - 1];
+  for (let i = 0; i <= maxGi; i++) {
+    if ((scoreAt(i) || 0) >= 4) { curStreak++; bestStreak = Math.max(bestStreak, curStreak); }
+    else { curStreak = 0; }
+  }
+  // What's left in curStreak is the run ending at the latest scored week.
+  const currentStreak = curStreak;
+
+  // Per period-run averages (Year N · Period Name), in chronological order
+  const runMap = new Map();
+  weekData.forEach(wd => {
+    if (!scoreAt(wd.gi)) return;
+    const key = `Y${wd.year} ${wd.periodName}`;
+    if (!runMap.has(key)) runMap.set(key, { sum: 0, n: 0, order: wd.gi });
+    const r = runMap.get(key);
+    r.sum += scoreAt(wd.gi); r.n++;
+  });
+  const periodBars = Array.from(runMap.entries())
+    .map(([label, r]) => ({ label, avg: r.sum / r.n, order: r.order }))
+    .sort((a, b) => a.order - b.order);
+
+  // Average score per tag ("how do exam weeks compare?").
+  const tagAgg = new Map();
+  scoredEntries.forEach(gi => {
+    const meta = metaAt(gi);
+    if (!meta || !meta.tags || !meta.tags.length) return;
+    meta.tags.forEach(tag => {
+      if (!tagAgg.has(tag)) tagAgg.set(tag, { sum: 0, n: 0 });
+      const t = tagAgg.get(tag);
+      t.sum += scoreAt(gi); t.n++;
+    });
+  });
+  const tagStats = Array.from(tagAgg.entries())
+    .map(([tag, v]) => ({ tag, count: v.n, avg: v.sum / v.n }))
+    .sort((a, b) => b.count - a.count || b.avg - a.avg);
+
+  return {
+    termAvg: termN ? termSum / termN : null,
+    brkAvg: brkN ? brkSum / brkN : null,
+    best, worst, bestStreak, currentStreak,
+    trend: scoredEntries.map(gi => ({ gi, sc: scoreAt(gi) })),
+    periodBars, tagStats,
+  };
+}
+
+function renderSparkline(trend) {
+  if (trend.length < 2) return '<div class="insight-empty">Score at least 2 weeks to see a trend line.</div>';
+  // Points sit at their calendar week, so unscored stretches show as gaps (same reasoning as
+  // the streak). Back-to-back weeks get a solid line; across a gap it's faint and dashed.
+  const w = 760, h = 90, pad = 8;
+  const g0 = trend[0].gi, span = Math.max(1, trend[trend.length - 1].gi - g0);
+  const xFor = gi => (pad + ((gi - g0) / span) * (w - pad * 2)).toFixed(1);
+  const yFor = sc => (h - pad - ((sc - 1) / 4) * (h - pad * 2)).toFixed(1);
+  let solid = '', dashed = '';
+  for (let i = 1; i < trend.length; i++) {
+    const a = trend[i - 1], b = trend[i];
+    const seg = `M${xFor(a.gi)},${yFor(a.sc)} L${xFor(b.gi)},${yFor(b.sc)} `;
+    if (b.gi - a.gi === 1) solid += seg; else dashed += seg;
+  }
+  const dots = trend.map(t =>
+    `<circle cx="${xFor(t.gi)}" cy="${yFor(t.sc)}" r="2.4" style="fill:var(--g3)"></circle>`
+  ).join('');
+  return svgEl(w, h,
+    (dashed ? `<path d="${dashed}" fill="none" style="stroke:var(--faint)" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"></path>` : '') +
+    (solid ? `<path d="${solid}" fill="none" style="stroke:var(--g3)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></path>` : '') +
+    dots
+  );
+}
+
+function renderBarChart(bars) {
+  if (!bars.length) return '';
+  // Drawn at real pixel size in a sideways-scrolling box, so labels stay readable on phones
+  // instead of shrinking with the chart. Labels are rotated so long names don't overlap.
+  const barW = 40, barGap = 14, h = 200, padBottom = 96, padTop = 18;
+  const chartH = h - padBottom - padTop;
+  let x = 64; // room on the left for the first rotated label
+  let bodyEls = '';
+  bars.forEach(b => {
+    const bh = (b.avg / 5) * chartH;
+    const y = padTop + (chartH - bh);
+    const cx = (x + barW / 2).toFixed(1), ly = (padTop + chartH + 14).toFixed(1);
+    bodyEls += `<rect x="${x}" y="${y.toFixed(1)}" width="${barW}" height="${bh.toFixed(1)}" rx="2" style="fill:var(--g3)"></rect>`;
+    bodyEls += `<text x="${cx}" y="${(y - 6).toFixed(1)}" text-anchor="middle" style="fill:var(--text)" font-size="11" font-family="IBM Plex Mono, monospace">${b.avg.toFixed(1)}</text>`;
+    bodyEls += `<text x="${cx}" y="${ly}" transform="rotate(-40 ${cx} ${ly})" text-anchor="end" style="fill:var(--muted)" font-size="11" font-family="IBM Plex Mono, monospace"><title>${escapeHtml(b.label)}</title>${escapeHtml(b.label.replace('Break','Brk'))}</text>`;
+    x += barW + barGap;
+  });
+  const w = x;
+  return `<div class="chart-scroll"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">${bodyEls}</svg></div>`;
+}
+
+let filterTag = null;
+
+function applyGridFilter() {
+  weekEls.forEach((sq, gi) => {
+    if (!sq) return;
+    if (!filterTag) { sq.classList.remove('dimmed', 'filter-match'); return; }
+    const meta = metaAt(gi);
+    const match = !!(meta && meta.tags && meta.tags.includes(filterTag));
+    sq.classList.toggle('dimmed', !match);
+    sq.classList.toggle('filter-match', match);
+  });
+}
+
+function updateInsights() {
+  const data = computeInsights();
+  if (!data) {
+    insightBody.innerHTML = '<div class="insight-empty">Score a few weeks to unlock insights.</div>';
+    filterTag = null;
+    return;
+  }
+  const bestWd = weekData[data.best], worstWd = weekData[data.worst];
+  const bestMeta = metaAt(data.best), worstMeta = metaAt(data.worst);
+
+  const tagStatsHtml = data.tagStats.length
+    ? `<div class="tag-chips">${data.tagStats.slice(0, 14).map(t =>
+        `<button type="button" class="tag-chip${t.tag === filterTag ? ' active' : ''}" data-tag="${escapeHtml(t.tag)}">#${escapeHtml(t.tag)} · ${t.count} · avg ${t.avg.toFixed(1)}</button>`
+      ).join('')}</div>${filterTag ? `<div class="ic-sub filter-note">Grid filtered to <strong>#${escapeHtml(filterTag)}</strong> — click it again, or <button type="button" id="clearTagFilterBtn" class="btn-danger-text">clear</button></div>` : ''}`
+    : '<div class="insight-empty compact">No tags yet — add some from the score modal to spot patterns.</div>';
+
+  insightBody.innerHTML = `
+    <div class="insight-cards">
+      <div class="insight-card">
+        <span class="ic-label">Term-time avg</span>
+        <span class="ic-value">${data.termAvg !== null ? data.termAvg.toFixed(2) : '—'}</span>
+        <span class="ic-sub">during term time</span>
+      </div>
+      <div class="insight-card">
+        <span class="ic-label">Break avg</span>
+        <span class="ic-value">${data.brkAvg !== null ? data.brkAvg.toFixed(2) : '—'}</span>
+        <span class="ic-sub">during breaks</span>
+      </div>
+      <div class="insight-card">
+        <span class="ic-label">Current streak</span>
+        <span class="ic-value">${data.currentStreak}</span>
+        <span class="ic-sub">weeks ≥4, ending at your last entry</span>
+      </div>
+      <div class="insight-card">
+        <span class="ic-label">Best streak</span>
+        <span class="ic-value">${data.bestStreak}</span>
+        <span class="ic-sub">longest run of weeks ≥4</span>
+      </div>
+      <div class="insight-card">
+        <span class="ic-label">Best week</span>
+        <span class="ic-value">${scoreAt(data.best)}/5</span>
+        <span class="ic-sub">${escapeHtml(bestWd.periodName)} · ${fmt(bestWd.weekStart)}${bestMeta && bestMeta.note ? ' · “' + escapeHtml(bestMeta.note.length > 40 ? bestMeta.note.slice(0,40)+'…' : bestMeta.note) + '”' : ''}</span>
+      </div>
+      <div class="insight-card">
+        <span class="ic-label">Worst week</span>
+        <span class="ic-value">${scoreAt(data.worst)}/5</span>
+        <span class="ic-sub">${escapeHtml(worstWd.periodName)} · ${fmt(worstWd.weekStart)}${worstMeta && worstMeta.note ? ' · “' + escapeHtml(worstMeta.note.length > 40 ? worstMeta.note.slice(0,40)+'…' : worstMeta.note) + '”' : ''}</span>
+      </div>
+    </div>
+    <div class="insight-chart-wrap">
+      <div class="insight-chart-title">Score trend over time</div>
+      ${renderSparkline(data.trend)}
+    </div>
+    <div class="insight-chart-wrap">
+      <div class="insight-chart-title">Average per term / break</div>
+      ${renderBarChart(data.periodBars)}
+    </div>
+    <div class="insight-chart-wrap">
+      <div class="insight-chart-title">By tag — click one to filter the grid</div>
+      ${tagStatsHtml}
+    </div>
+    <div class="panel-sign" aria-hidden="true">${SIGN}</div>
+  `;
+}
+
+insightBody.addEventListener('click', (e) => {
+  if (e.target.id === 'clearTagFilterBtn') {
+    filterTag = null;
+    updateInsights();
+    applyGridFilter();
+    return;
+  }
+  const chip = e.target.closest('.tag-chip');
+  if (!chip || !chip.dataset.tag) return;
+  filterTag = (filterTag === chip.dataset.tag) ? null : chip.dataset.tag;
+  updateInsights();
+  applyGridFilter();
+});
+
+// ─────────────────────────────────────────────
+// PLACEMENT TRACKER
+// Events are stored by date and matched to the week containing that date when drawn.
+// ─────────────────────────────────────────────
+function computePlacementGiMap() {
+  const map = new Map(); // gi -> [events]
+  if (!weekData.length || !placementEvents.length) return map;
+  placementEvents.forEach(ev => {
+    const d = pd(ev.date);
+    if (!d) return;
+    const gi = giForDate(weekData, d);
+    if (gi < 0) return;
+    if (!map.has(gi)) map.set(gi, []);
+    map.get(gi).push(ev);
+  });
+  return map;
+}
+
+// Dates are 'YYYY-MM-DD', so comparing the strings sorts them. sort() is stable, so
+// entries on the same day keep the order they were logged in.
+function byEventDate(a, b) { return a.date.localeCompare(b.date); }
+
+function companyKey(name) { return name.trim().toLowerCase().replace(/\s+/g, ' '); }
+
+// Existing companies, offered as suggestions in the Company field.
+function renderCompanySuggestions() {
+  const seen = new Map();
+  placementEvents.forEach(ev => { const k = companyKey(ev.company); if (!seen.has(k)) seen.set(k, ev.company.trim()); });
+  const dl = document.getElementById('pl-company-list');
+  dl.innerHTML = '';
+  [...seen.values()].sort((a, b) => a.localeCompare(b)).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    dl.appendChild(opt);
+  });
+}
+
+function renderPlacementPanel() {
+  const listEl = document.getElementById('placementList');
+  const statsEl = document.getElementById('placementStats');
+  if (!listEl || !statsEl) return;
+  renderCompanySuggestions();
+
+  if (!placementEvents.length) {
+    statsEl.innerHTML = '';
+    listEl.innerHTML = '<div class="insight-empty">No placement activity logged yet. Add your first application above.</div>';
+    return;
+  }
+
+  // Group case-insensitively ("Google" and "google" are one company), shown with the
+  // spelling it was first entered with.
+  const byCompany = new Map();
+  const displayName = new Map();
+  placementEvents.forEach(ev => {
+    const k = companyKey(ev.company);
+    if (!displayName.has(k)) displayName.set(k, ev.company.trim());
+    const name = displayName.get(k);
+    if (!byCompany.has(name)) byCompany.set(name, []);
+    byCompany.get(name).push(ev);
+  });
+
+  // A company's status is its latest round by date (same day: the one logged last), so
+  // reapplying after a rejection shows as in progress again.
+  let offers = 0, rejections = 0, inProgress = 0;
+  const companyStatus = new Map();
+  byCompany.forEach((events, company) => {
+    const status = events.slice().sort(byEventDate).pop().stage;
+    companyStatus.set(company, status);
+    if (status === 'offer') offers++;
+    else if (status === 'rejected') rejections++;
+    else inProgress++;
+  });
+
+  statsEl.innerHTML = `
+    <div class="insight-card"><span class="ic-label">Companies</span><span class="ic-value">${byCompany.size}</span></div>
+    <div class="insight-card"><span class="ic-label">In progress</span><span class="ic-value">${inProgress}</span></div>
+    <div class="insight-card"><span class="ic-label">Offers</span><span class="ic-value">${offers}</span></div>
+    <div class="insight-card"><span class="ic-label">Rejections</span><span class="ic-value">${rejections}</span></div>
+  `;
+
+  const latestDate = events => events.reduce((m, e) => e.date > m ? e.date : m, '');
+  const companiesSorted = Array.from(byCompany.entries())
+    .sort((a, b) => latestDate(b[1]).localeCompare(latestDate(a[1]))); // most recent activity first
+
+  listEl.innerHTML = companiesSorted.map(([company, events]) => {
+    const status = companyStatus.get(company);
+    const rows = events.slice().sort(byEventDate).map(ev => `
+      <div class="placement-event-row${ev.id === editingPlacementId ? ' editing' : ''}">
+        <span class="pe-stage">${escapeHtml(PLACEMENT_STAGE_LABELS[ev.stage] || ev.stage)}</span>
+        <span class="pe-date">${escapeHtml(fmt(pd(ev.date)))}</span>
+        ${ev.note ? `<span class="pe-note">${escapeHtml(ev.note)}</span>` : ''}
+        <button type="button" class="placement-event-edit" data-edit-id="${escapeHtml(ev.id)}" aria-label="Edit this entry" title="Edit">✎</button>
+        <button type="button" class="placement-event-remove" data-remove-id="${escapeHtml(ev.id)}" aria-label="Delete this entry" title="Delete">✕</button>
+      </div>
+    `).join('');
+    return `
+      <div class="placement-company-group">
+        <div class="placement-company-header">
+          <span class="placement-company-name">${escapeHtml(company)}</span>
+          <span class="placement-status-chip ${status}">${escapeHtml(PLACEMENT_STAGE_LABELS[status] || status)}</span>
+        </div>
+        ${rows}
+      </div>
+    `;
+  }).join('');
+}
+
+// The form above the list adds entries, or edits one when its ✎ button is pressed.
+const plForm = {
+  company: document.getElementById('pl-company'),
+  stage:   document.getElementById('pl-stage'),
+  date:    document.getElementById('pl-date'),
+  note:    document.getElementById('pl-note'),
+  submit:  document.getElementById('btnAddPlacement'),
+  cancel:  document.getElementById('btnCancelPlacementEdit'),
+};
+
+// What the form held before editing started, put back when editing ends.
+let plFormBeforeEdit = null;
+
+function setPlacementEditing(ev) {
+  if (ev && !editingPlacementId) {
+    plFormBeforeEdit = { company: plForm.company.value, stage: plForm.stage.value, date: plForm.date.value, note: plForm.note.value };
+  }
+  const values = ev || plFormBeforeEdit || { company: '', stage: 'applied', date: '', note: '' };
+  if (!ev) plFormBeforeEdit = null;
+  editingPlacementId = ev ? ev.id : null;
+  plForm.company.value = values.company;
+  plForm.stage.value = values.stage;
+  plForm.date.value = values.date;
+  plForm.note.value = values.note;
+  plForm.submit.textContent = ev ? 'Save changes' : 'Add';
+  plForm.cancel.hidden = !ev;
+  plForm.submit.closest('.placement-form').classList.toggle('editing', !!ev);
+  renderPlacementPanel();
+  if (ev) plForm.company.focus();
+}
+
+plForm.submit.addEventListener('click', async () => {
+  let company = plForm.company.value.trim().replace(/\s+/g, ' ').slice(0, 40);
+  const stage = plForm.stage.value;
+  const date = plForm.date.value;
+  const note = plForm.note.value.trim().slice(0, 80);
+
+  if (!company) { await uiAlert('Company missing', 'Enter a company name.'); plForm.company.focus(); return; }
+  if (!pd(date)) { await uiAlert('Date missing', 'Pick a date for this entry.'); plForm.date.focus(); return; }
+
+  // Reuse the existing spelling if this company is already logged under different capitals.
+  const existing = placementEvents.find(ev => ev.id !== editingPlacementId && companyKey(ev.company) === companyKey(company));
+  if (existing) company = existing.company.trim();
+
+  const target = editingPlacementId && placementEvents.find(ev => ev.id === editingPlacementId);
+  if (target) Object.assign(target, { company, stage, date, note });
+  else placementEvents.push({ id: `pl-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, company, stage, date, note });
+
+  savePlacementEvents();
+  const wasEditing = !!target;
+  setPlacementEditing(null);
+  if (!wasEditing) { plForm.company.value = ''; plForm.note.value = ''; } // keep round + date for the next entry
+  renderGrid();
+});
+plForm.cancel.addEventListener('click', () => setPlacementEditing(null));
+
+document.getElementById('placementList').addEventListener('click', (e) => {
+  const editBtn = e.target.closest('.placement-event-edit');
+  if (editBtn) {
+    const ev = placementEvents.find(x => x.id === editBtn.dataset.editId);
+    if (ev) setPlacementEditing(ev);
+    return;
+  }
+  const removeBtn = e.target.closest('.placement-event-remove');
+  if (!removeBtn) return;
+  const index = placementEvents.findIndex(ev => ev.id === removeBtn.dataset.removeId);
+  if (index < 0) return;
+  const [removed] = placementEvents.splice(index, 1);
+  if (removed.id === editingPlacementId) setPlacementEditing(null);
+  savePlacementEvents();
+  renderGrid();
+  showUndoToast(`Deleted ${removed.company} (${PLACEMENT_STAGE_LABELS[removed.stage]})`, () => {
+    placementEvents.splice(Math.min(index, placementEvents.length), 0, removed);
+    savePlacementEvents();
+    renderGrid();
+  });
+});
+
+const placementPanel = document.getElementById('placementPanel');
+const placementToggleBtn = document.getElementById('placementToggleBtn');
+let placementOpen = false;
+function setPlacementOpen(open) {
+  placementOpen = open;
+  placementPanel.classList.toggle('open', open);
+  placementToggleBtn.textContent = open ? '✕ Hide placements' : '🎯 Placements';
+}
+placementToggleBtn.addEventListener('click', () => setPlacementOpen(!placementOpen));
+
+// Whether the placement tracker is shown at all (button, panel, gold dots, mentions on weeks).
+// "auto" shows it from the start of the program's final year — when placement season
+// happens — and always once anything has been logged, so existing entries never vanish.
+// The data itself is never touched by this setting.
+function placementsVisible() {
+  if (placementMode === 'on') return true;
+  if (placementMode === 'off') return false;
+  if (placementEvents.length) return true;
+  const finalYear = weekData.find(w => w.year === programYears);
+  return !!finalYear && today() >= finalYear.weekStart;
+}
+function updatePlacementVisibility() {
+  const show = placementsVisible();
+  placementToggleBtn.hidden = !show;
+  if (!show && placementOpen) setPlacementOpen(false);
+}
+
+const placementModeSelect = document.getElementById('placementMode');
+placementModeSelect.addEventListener('change', () => {
+  placementMode = placementModeSelect.value;
+  writeStr(KEY_PLACEMENT_MODE, placementMode);
+  renderGrid(); // applies straight away — no need to rebuild the calendar
+  if (placementMode === 'on' && !placementOpen) setPlacementOpen(true);
+});
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+const overlay      = document.getElementById('modalOverlay');
+const modalDialog  = document.getElementById('modalDialog');
+const modalTitle   = document.getElementById('modal-title');
+const modalSub     = document.getElementById('modal-sub');
+const modalNote    = document.getElementById('modal-note');
+const tagChipsEl   = document.getElementById('modal-tag-chips');
+const tagInputEl   = document.getElementById('modal-tag-input');
+let activeGi = null;
+let pendingScore = null;
+let activeTags = new Set();
+
+function renderTagChips() {
+  tagChipsEl.innerHTML = '';
+  const custom = Array.from(activeTags).filter(t => !SUGGESTED_TAGS.includes(t));
+  const all = [...SUGGESTED_TAGS, ...custom];
+  all.forEach(tag => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'tag-chip' + (activeTags.has(tag) ? ' active' : '');
+    chip.setAttribute('aria-pressed', String(activeTags.has(tag)));
+    chip.textContent = tag;
+    chip.addEventListener('click', () => {
+      if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagChips();
+    });
+    tagChipsEl.appendChild(chip);
+  });
+}
+
+function addCustomTag() {
+  const val = tagInputEl.value.trim().toLowerCase().replace(/\s+/g, '-').slice(0, 24);
+  if (val) { activeTags.add(val); renderTagChips(); }
+  tagInputEl.value = '';
+}
+document.getElementById('modal-tag-add').addEventListener('click', addCustomTag);
+tagInputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addCustomTag(); }
+});
+
+function openModal(gi) {
+  activeGi = gi;
+  const wd = weekData[gi];
+  modalTitle.textContent = `${wd.periodName} — Week ${wd.weekInPeriod}`;
+  modalSub.textContent   = `Year ${wd.year} · ${fmt(wd.weekStart)} – ${fmt(wd.weekEnd)}`;
+  const weekPlacements = placementsVisible() ? (computePlacementGiMap().get(gi) || []) : [];
+  document.getElementById('modal-placements').textContent = weekPlacements.length
+    ? '🎯 ' + weekPlacements.map(ev => `${ev.company} (${PLACEMENT_STAGE_LABELS[ev.stage] || ev.stage})`).join(', ')
+    : '';
+  hideTooltip();
+
+  pendingScore = scoreAt(gi) || null;
+  document.querySelectorAll('.score-btn').forEach(b => {
+    const on = parseInt(b.dataset.s, 10) === pendingScore;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+
+  const meta = metaAt(gi) || {};
+  modalNote.value = meta.note || '';
+  activeTags = new Set(meta.tags || []);
+  renderTagChips();
+  tagInputEl.value = '';
+
+  overlay.classList.add('open');
+  modalDialog.focus();
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  const gi = activeGi;
+  activeGi = null;
+  // Return focus to the square that opened this modal, not wherever the mouse happens to be —
+  // re-looked-up by index since renderGrid() may have already rebuilt the DOM by this point.
+  if (gi !== null && weekEls[gi]) {
+    weekEls[gi].focus();
+  }
+}
+
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.getElementById('btnClose').addEventListener('click', closeModal);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape' || !overlay.classList.contains('open')) return;
+  closeModal();
+});
+
+// Basic focus trap: while the modal is open, Tab/Shift+Tab wraps within it instead of
+// escaping to the (invisible, blocked) page behind it.
+overlay.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab' || !overlay.classList.contains('open')) return;
+  const focusables = Array.from(modalDialog.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])'))
+    .filter(node => !node.disabled && node.offsetParent !== null);
+  if (!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+// No "are you sure?" — clearing is instant, with an Undo bar for 8 seconds instead.
+document.getElementById('btnClear').addEventListener('click', () => {
+  if (activeGi === null) return;
+  const gi = activeGi, wd = weekData[gi];
+  const prevScore = scoreAt(gi), prevMeta = metaAt(gi);
+  if (!prevScore && !prevMeta) { closeModal(); return; }
+  setWeekEntry(gi, null, null);
+  saveScores(); saveNotesTags(); renderGrid(); closeModal();
+  showUndoToast(`Cleared ${wd.periodName} — week ${wd.weekInPeriod}`, () => {
+    // Find the week by date, in case the calendar changed in the meantime.
+    const back = giForDate(weekData, wd.weekStart);
+    if (back < 0) return;
+    setWeekEntry(back, prevScore, prevMeta && { note: prevMeta.note, tags: [...prevMeta.tags] });
+    saveScores(); saveNotesTags(); renderGrid();
+  });
+});
+
+document.querySelectorAll('.score-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    pendingScore = parseInt(b.dataset.s, 10);
+    document.querySelectorAll('.score-btn').forEach(x => {
+      x.classList.toggle('active', x === b);
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+  });
+});
+
+document.getElementById('btnSaveWeek').addEventListener('click', () => {
+  if (activeGi === null) return;
+  const noteVal = modalNote.value.trim().slice(0, 500);
+  const tagsVal = Array.from(activeTags);
+  setWeekEntry(activeGi, pendingScore || null,
+    (noteVal || tagsVal.length) ? { note: noteVal, tags: tagsVal } : null);
+
+  saveScores(); saveNotesTags(); renderGrid(); closeModal();
+});
+
+// ─────────────────────────────────────────────
+// DATA BACKUP — export / import / reset
+// ─────────────────────────────────────────────
+// Shows how long ago the last backup was, and turns red after 30 days (or if there's never
+// been one and there's something to lose).
+function updateBackupNote() {
+  const note = document.getElementById('backupNote');
+  const last = Date.parse(readStr(KEY_LAST_BACKUP) || '');
+  const hasData = Object.keys(scores).length || Object.keys(notesTags).length || placementEvents.length;
+  let text, stale;
+  if (isNaN(last)) {
+    text = hasData ? 'No backup yet' : 'Export a backup regularly';
+    stale = !!hasData;
+  } else {
+    const days = Math.floor((today() - new Date(new Date(last).toDateString())) / 86400000);
+    text = 'Last backup: ' + (days <= 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`);
+    stale = days > 30;
+  }
+  note.textContent = `⚠ Your data lives only in this browser. ${text}.`;
+  note.classList.toggle('stale', stale);
+}
+// ─────────────────────────────────────────────
+document.getElementById('btnExport').addEventListener('click', () => {
+  const payload = {
+    app: 'academic-life-tracker', version: 6, exportedAt: new Date().toISOString(),
+    madeWith: `Academic Life Tracker by Arush Giri ${SIGN}`,
+    start: readStr(KEY_START),
+    programYears, overrides, scores, notesTags, customPeriods, periodNames,
+    calendarPreset, placementEvents, placementMode,
+  };
+  downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
+    `academic-life-tracker-backup-${ds(today())}.json`);
+  writeStr(KEY_LAST_BACKUP, payload.exportedAt);
+  updateBackupNote();
+});
+
+document.getElementById('btnImportTrigger').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    let data;
+    try {
+      data = JSON.parse(ev.target.result);
+      if (!data || typeof data !== 'object' || !('scores' in data)) throw new Error('not a backup file');
+    } catch (err) {
+      e.target.value = '';
+      await uiAlert('Can\'t import this file', 'That doesn\'t look like an Academic Life Tracker backup file.');
+      return;
+    }
+    const when = Date.parse(data.exportedAt);
+    const ok = await uiConfirm('Import this backup?',
+      (isNaN(when) ? 'This backup' : `This backup from ${fmt(new Date(when))}`) +
+      ' will replace everything currently stored in this browser: your calendar, scores, notes and placements.',
+      { okText: 'Import', danger: true });
+    e.target.value = '';
+    if (!ok) return;
+    // Replace, not merge: clear all data first so nothing lingers. Theme is kept.
+    ALL_DATA_KEYS.forEach(removeKey);
+    // Backups before v6 store scores/notes by week number; those go to the legacy keys and
+    // are converted on reload, against the calendar settings from the same backup.
+    // Everything else is cleaned by data.js when it's loaded, like any stored data.
+    const isLegacy = !(Number(data.version) >= 6);
+    if (typeof data.start === 'string' && pd(data.start)) writeStr(KEY_START, data.start);
+    if (data.programYears) writeStr(KEY_YEARS, String(data.programYears));
+    if (PRESET_NAMES.includes(data.calendarPreset)) writeStr(KEY_CALENDAR_PRESET, data.calendarPreset);
+    if (Array.isArray(data.overrides)) writeJSON(KEY_OVERRIDES, data.overrides);
+    if (data.periodNames && typeof data.periodNames === 'object') writeJSON(KEY_PERIOD_NAMES, data.periodNames);
+    if (Array.isArray(data.customPeriods)) writeJSON(KEY_CUSTOM, data.customPeriods);
+    if (data.scores) writeJSON(isLegacy ? KEY_SCORES_LEGACY : KEY_SCORES, data.scores);
+    if (data.notesTags) writeJSON(isLegacy ? KEY_NOTES_LEGACY : KEY_NOTES, data.notesTags);
+    if (Array.isArray(data.placementEvents)) writeJSON(KEY_PLACEMENT, data.placementEvents);
+    if (['auto', 'on', 'off'].includes(data.placementMode)) writeStr(KEY_PLACEMENT_MODE, data.placementMode);
+    // The imported file is itself a backup of exactly this data.
+    if (typeof data.exportedAt === 'string' && !isNaN(Date.parse(data.exportedAt))) writeStr(KEY_LAST_BACKUP, data.exportedAt);
+    location.reload();
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('btnResetAll').addEventListener('click', async () => {
+  if (!(await uiConfirm('Delete all your data?',
+    'This permanently deletes everything stored in this browser: your start date and calendar settings, every score, note and tag, and all placement entries.\n\nIt can\'t be undone. If you might want it back, export a backup first.',
+    { okText: 'Delete everything', danger: true }))) return;
+  [...ALL_DATA_KEYS, KEY_NOTIFY].forEach(removeKey);
+  location.reload();
+});
+
+// ─────────────────────────────────────────────
+// SHARE AS IMAGE — draws the grid to a PNG, then shares (phones) or downloads (desktop) it
+// ─────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function exportGridPng() {
+  if (!weekData.length) { uiAlert('Nothing to share yet', 'Build your calendar first.'); return; }
+
+  const tod = today();
+  const cgi = currentGi();
+  const sq = 12, gap = 3, rowStep = sq + gap, labelW = 132;
+  const headerH = 78, rowHeight = 24, footerH = 40, pad = 26;
+
+  let maxRunLen = 0, totalRows = 0;
+  Array.from({length: programYears}, (_, i) => i + 1).forEach(y => {
+    const yWeeks = weekData.filter(w => w.year === y);
+    if (!yWeeks.length) return;
+    totalRows += 1;
+    let curName = null, curLen = 0;
+    yWeeks.forEach(wd => {
+      if (wd.periodName !== curName) { totalRows += 1; curName = wd.periodName; curLen = 0; }
+      curLen++;
+      maxRunLen = Math.max(maxRunLen, curLen);
+    });
+  });
+
+  const scale = 2;
+  const canvasW = Math.max(labelW + maxRunLen * rowStep + pad * 2, 640);
+  const canvasH = headerH + totalRows * rowHeight + footerH + pad;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasW * scale;
+  canvas.height = canvasH * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const bg = isDark ? '#15120e' : '#f7f4ef';
+  const text = isDark ? '#f3ede2' : '#1a1410';
+  const muted = isDark ? '#ad9f8c' : '#6b5f52';
+  const blankC = isDark ? '#2a2419' : '#e8e0d4';
+  const brkC = isDark ? '#1c2434' : '#dce4f0';
+  const greens = isDark
+    ? ['#16311a', '#276e33', '#3fa350', '#63d477', '#a8f0b6']
+    : ['#c8e6c9', '#66bb6a', '#2e7d32', '#1b5e20', '#0a2e0a'];
+
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvasW, canvasH);
+
+  ctx.fillStyle = text;
+  ctx.font = "700 22px 'Playfair Display', Georgia, serif";
+  ctx.fillText('My Academic Journey', pad, 34);
+
+  const weekScores = weekData.map(wd => scoreAt(wd.gi)).filter(Boolean);
+  const scoredCount = weekScores.length;
+  const sum = weekScores.reduce((a, v) => a + v, 0);
+  const avg = scoredCount ? (sum / scoredCount).toFixed(2) : '—';
+  ctx.font = "11px 'IBM Plex Mono', monospace";
+  ctx.fillStyle = muted;
+  ctx.fillText(`${scoredCount} weeks scored · ${avg} average · exported ${fmt(tod)}`, pad, 54);
+
+  let y = headerH;
+  Array.from({length: programYears}, (_, i) => i + 1).forEach(yr => {
+    const yWeeks = weekData.filter(w => w.year === yr);
+    if (!yWeeks.length) return;
+
+    ctx.fillStyle = muted;
+    ctx.font = "700 10px 'IBM Plex Mono', monospace";
+    ctx.fillText(`YEAR ${yr}`, pad, y + 13);
+    y += rowHeight;
+
+    const runs = [];
+    yWeeks.forEach(wd => {
+      if (!runs.length || runs[runs.length - 1].name !== wd.periodName) runs.push({ name: wd.periodName, weeks: [] });
+      runs[runs.length - 1].weeks.push(wd);
+    });
+
+    runs.forEach(run => {
+      ctx.fillStyle = muted;
+      ctx.font = "9px 'IBM Plex Mono', monospace";
+      ctx.fillText(run.name, pad, y + 14);
+
+      let x = pad + labelW;
+      run.weeks.forEach(wd => {
+        const gi = wd.gi;
+        const isPast = tod > wd.weekEnd;
+        const isCurrent = gi === cgi;
+        let color;
+        if (isCurrent) color = scoreAt(gi) ? greens[scoreAt(gi) - 1] : text;
+        else if (isPast) color = scoreAt(gi) ? greens[scoreAt(gi) - 1] : (wd.kind === 'break' ? brkC : blankC);
+        else color = wd.kind === 'break' ? brkC : blankC;
+
+        ctx.fillStyle = color;
+        roundRect(ctx, x, y, sq, sq, 2);
+        ctx.fill();
+        x += rowStep;
+      });
+      y += rowHeight;
+    });
+  });
+
+  ctx.font = "9px 'IBM Plex Mono', monospace";
+  ctx.fillStyle = muted;
+  ctx.fillText('academic-life-tracker', pad, canvasH - 14);
+  ctx.textAlign = 'right';
+  ctx.font = "11px 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', 'Segoe UI Historic', 'Apple Symbols', monospace";
+  ctx.fillText(SIGN, canvasW - pad, canvasH - 14);
+  ctx.textAlign = 'left';
+
+  canvas.toBlob(async blob => {
+    const filename = `academic-life-tracker-${ds(tod)}.png`;
+    // On phones, open the share sheet (WhatsApp, Instagram, Save to Photos…). On desktops a
+    // download is what people expect, and the OS share dialog there is clunky.
+    const file = new File([blob], filename, { type: 'image/png' });
+    const isTouch = window.matchMedia('(pointer: coarse)').matches;
+    if (isTouch && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'My Academic Journey' });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // user closed the share sheet
+        // any other failure (e.g. share not allowed here) — fall through to a plain download
+      }
+    }
+    downloadBlob(blob, filename);
+  });
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+document.getElementById('btnSharePng').addEventListener('click', exportGridPng);
+
+// ─────────────────────────────────────────────
+// EXPORT JOURNAL — a readable Markdown diary (the JSON backup is for restoring into the app)
+// ─────────────────────────────────────────────
+function exportJournalMarkdown() {
+  if (!weekData.length) { uiAlert('Nothing to export yet', 'Build your calendar first.'); return; }
+  const scoredWeeks = weekData.filter(wd => scoreAt(wd.gi)).sort((a, b) => a.gi - b.gi);
+  if (!scoredWeeks.length) { uiAlert('Nothing to export yet', 'Score at least one week first.'); return; }
+
+  const lines = [];
+  lines.push('# My Academic Journey');
+  lines.push('');
+  lines.push(`_Exported ${fmt(today())} · ${scoredWeeks.length} of ${weekData.length} weeks scored_`);
+
+  let curYear = null, curPeriod = null;
+  scoredWeeks.forEach(wd => {
+    if (wd.year !== curYear) {
+      lines.push(`\n## Year ${wd.year}`);
+      curYear = wd.year; curPeriod = null;
+    }
+    if (wd.periodName !== curPeriod) {
+      lines.push(`\n### ${wd.periodName}`);
+      curPeriod = wd.periodName;
+    }
+    const meta = metaAt(wd.gi);
+    const sc = scoreAt(wd.gi);
+    const stars = '★'.repeat(sc) + '☆'.repeat(5 - sc);
+    lines.push('');
+    lines.push(`**Week of ${fmt(wd.weekStart)}** — ${stars} (${sc}/5)`);
+    if (meta && meta.tags && meta.tags.length) {
+      lines.push(`Tags: ${meta.tags.map(t => '#' + t).join(' ')}`);
+    }
+    if (meta && meta.note) {
+      lines.push('');
+      lines.push(meta.note.split('\n').map(l => '> ' + l).join('\n'));
+    }
+  });
+
+  lines.push('', '---', '', '_' + SIGN + ' made with Academic Life Tracker by Arush Giri_');
+  downloadBlob(new Blob([lines.join('\n') + '\n'], { type: 'text/markdown' }), `academic-life-journal-${ds(today())}.md`);
+}
+document.getElementById('btnExportJournal').addEventListener('click', exportJournalMarkdown);
+
+// ─────────────────────────────────────────────
+// BUILD BUTTON
+// ─────────────────────────────────────────────
+document.getElementById('programYears').addEventListener('change', () => {
+  updateStartCardDesc();
+});
+document.getElementById('calendarPreset').addEventListener('change', () => {
+  updateStartCardDesc();
+});
+function updateStartCardDesc() {
+  const n = document.getElementById('programYears').value;
+  const preset = document.getElementById('calendarPreset').value;
+  const structureText = preset === 'trimester'
+    ? `${n * 3} trimesters`
+    : preset === 'annual'
+      ? `${n} academic years`
+      : `${n * 2} semesters`;
+  document.getElementById('startCardDesc').innerHTML =
+    `All ${n} years and ${structureText} are calculated from this one date.` +
+    '<br>You can change any period\'s dates or name below if needed.';
+}
+
+document.getElementById('btnBuild').addEventListener('click', () => {
+  const val = document.getElementById('startDate').value;
+  const s   = pd(val);
+  if (!s) { uiAlert('Start date missing', 'Enter the first day of your program.'); return; }
+
+  programYears = parseInt(document.getElementById('programYears').value, 10) || 4;
+  overrides = padArray(overrides, programYears, () => ({}));
+  customPeriods = padArray(customPeriods, programYears, () => []);
+  calendarPreset = document.getElementById('calendarPreset').value;
+  saveProgramYears(); saveCalendarPreset(); saveOverrides(); saveCustomPeriods();
+
+  writeStr(KEY_START, val);
+  rebuildWeeks();
+  migrateLegacyWeekData();
+  buildAdvPanel();
+  renderGrid();
+});
+
+// ─────────────────────────────────────────────
+// ﹏𓊝﹏ EASTER EGG
+// Click the sign at the bottom of the page, or just type "rush" anywhere (outside a text
+// box), and a wave rolls across your weeks.
+// ─────────────────────────────────────────────
+function signWave() {
+  gridEl.classList.remove('signwave');
+  void gridEl.offsetWidth; // restart the animation if it's already running
+  gridEl.classList.add('signwave');
+  setTimeout(() => gridEl.classList.remove('signwave'), 600 + weekData.length * 6 + 200);
+  showUndoToast(`${SIGN}  made with care by Arush Giri`, null);
+}
+document.getElementById('signMark').addEventListener('click', signWave);
+
+let typedRecently = '';
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+  if (e.target.closest('input, textarea, select, [contenteditable]') || uiDialogEl.open || overlay.classList.contains('open')) return;
+  typedRecently = (typedRecently + e.key.toLowerCase()).slice(-4);
+  if (typedRecently === 'rush') { typedRecently = ''; signWave(); }
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+(function init() {
+  const saved = readStr(KEY_START);
+  const startInput = document.getElementById('startDate');
+  const yrsSelect = document.getElementById('programYears');
+  const presetSelect = document.getElementById('calendarPreset');
+  yrsSelect.value = String(programYears);
+  presetSelect.value = calendarPreset;
+  document.getElementById('placementMode').value = placementMode;
+  updateStartCardDesc();
+
+  if (saved) {
+    startInput.value = saved;
+    rebuildWeeks();
+    migrateLegacyWeekData();
+  }
+  buildAdvPanel();
+  renderGrid();
+})();
+</script>
+</body>
+</html>

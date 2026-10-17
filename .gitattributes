@@ -1,0 +1,5 @@
+# ﹏𓊝﹏ Academic Life Tracker — Arush Giri
+# Keep line endings consistent whoever commits (Windows Git would otherwise convert to CRLF),
+# and never touch the images.
+* text=auto eol=lf
+*.png binary
