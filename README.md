@@ -82,7 +82,7 @@ It works fine on a phone. The squares get bigger so they're easy to tap. Dark mo
   <img src="screenshots/dark-mode.png" alt="The tracker in dark mode" width="420">
 </p>
 
-There's also a small easter egg hidden in there somewhere. If you spot a tiny boat (﹏𓊝﹏), give it a click.
+There's also a small signature of mine hidden in there somewhere. If you spot a tiny boat, give it a click.
 
 ## About your data
 
