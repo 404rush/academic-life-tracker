@@ -7,8 +7,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>
-  // Set the theme before anything is drawn, so dark mode doesn't flash white first.
-  // A choice made with the toggle wins; otherwise follow the device's light/dark setting.
+  // Sets the theme before anything is drawn, so dark mode doesn't flash white first.
+  // A choice made with the toggle prioritized; otherwise follows the device's light/dark setting.
   (function () {
     var t = null;
     try { t = localStorage.getItem('ugt_theme_v5'); } catch (e) { /* storage blocked: use the device setting */ }
@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<!-- ﹏𓊝﹏ Just the one hieroglyph in the sign (𓊝), so it shows on devices without a font for it -->
+<!-- ﹏𓊝﹏ -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Egyptian+Hieroglyphs&text=%F0%93%8A%9D&display=swap" rel="stylesheet">
 <style>
   /* ﹏𓊝﹏ */
@@ -49,11 +49,11 @@
     --blank:        #e8e0d4;
     --blank-border: #c8bca8;
 
-    /* Unscored break week — warm blue-grey tint */
+    /* Unscored break week - warm blue-grey tint */
     --brk:        #dce4f0;
     --brk-border: #b0bcd4;
 
-    /* Scored greens — rich, clear progression */
+    /* Scored greens - rich, clear progression */
     --g1: #c8e6c9; --g1b: #81c784;
     --g2: #66bb6a; --g2b: #388e3c;
     --g3: #2e7d32; --g3b: #1b5e20;
@@ -65,7 +65,7 @@
     --now-border: #1a1410;
     --now-pulse-rgb: 26,20,16;
 
-    /* Primary button hover — must contrast with --bg, which is the button's text colour */
+    /* Primary button hover - must contrast with --bg, which is the button's text colour */
     --btn-hover: #3a2e24;
   }
 
@@ -89,7 +89,7 @@
     --brk:        #1c2434;
     --brk-border: #33415c;
 
-    /* Scored greens — brighter = higher score against a dark bg */
+    /* Scored greens - brighter = higher score against a dark bg */
     --g1: #16311a; --g1b: #275c2c;
     --g2: #276e33; --g2b: #338a41;
     --g3: #3fa350; --g3b: #4cc061;
@@ -392,7 +392,7 @@
   .placement-event-row.editing { background: var(--surface2); border-radius: 3px; }
   .placement-form.editing { border-bottom-color: var(--text); }
 
-  /* Marker for weeks with a placement event — distinct from the note dot (top-right) */
+  /* Marker for weeks with a placement event - distinct from the note dot (top-right) */
   .week-placement-dot {
     position: absolute; bottom: -2px; left: -2px;
     width: 6px; height: 6px; border-radius: 50%;
@@ -636,20 +636,20 @@
   /* Unscored break */
   .week.brkblank { background: var(--brk);     border: 1px dashed var(--brk-border); }
 
-  /* Scored greens — 5 levels, light to very dark */
+  /* Scored greens - 5 levels, light to very dark */
   .week.p1 { background: var(--g1); border-color: var(--g1b); color: var(--text); }
   .week.p2 { background: var(--g2); border-color: var(--g2b); color: var(--text); }
   .week.p3 { background: var(--g3); border-color: var(--g3b); color:#fff; }
   .week.p4 { background: var(--g4); border-color: var(--g4b); color:#fff; }
   .week.p5 { background: var(--g5); border-color: var(--g5b); color:#fff; }
 
-  /* Current week — solid square, unscored */
+  /* Current week - solid square, unscored */
   .week.now {
     background: var(--now-bg);
     border-color: var(--now-border);
     animation: nowpulse 2s infinite;
   }
-  /* Current week, already scored mid-week — keep its score color, add the pulse ring */
+  /* Current week, already scored mid-week - keep its score color, add the pulse ring */
   .week.now-scored { animation: nowpulse 2s infinite; }
   @keyframes nowpulse {
     0%,100% { box-shadow: 0 0 0 2px rgba(var(--now-pulse-rgb),0.18); }
@@ -657,7 +657,7 @@
   }
 
   .week.clickable { cursor: pointer; }
-  /* Hover zoom only for real pointers — on touch screens :hover "sticks" after a tap */
+  /* Hover zoom only for real pointers - on touch screens :hover "sticks" after a tap */
   @media (hover: hover) {
     .week.clickable:hover { transform: scale(1.5); z-index: 20; box-shadow: 0 0 0 2px var(--g3); }
   }
@@ -666,7 +666,7 @@
     box-shadow: 0 0 0 2px var(--text);
   }
 
-  /* Score shown as a digit on the square itself — not color-only */
+  /* Score shown as a digit on the square itself - not color-only */
   .week-digit {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -682,7 +682,7 @@
     pointer-events: none;
   }
 
-  /* Tag filter — dim non-matching weeks, ring the matches */
+  /* Tag filter - dim non-matching weeks, ring the matches */
   .week.dimmed { opacity: 0.14; }
   .week.filter-match { box-shadow: 0 0 0 1.5px var(--g3); }
 
@@ -718,7 +718,7 @@
     font-size: 0.744rem; color: var(--muted);
     letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 18px;
   }
-  /* Placement events for the week — shown here because touch screens have no hover tooltip */
+  /* Placement events for the week - shown here because touch screens have no hover tooltip */
   .modal-placements {
     font-size: 0.744rem; color: var(--muted); margin: -8px 0 16px; line-height: 1.6;
   }
@@ -872,7 +872,7 @@
   }
   .sign:hover { color: var(--text); }
 
-  /* ﹏𓊝﹏ the little sign that appears around the app — and the wave it sends across the grid */
+  /* ﹏𓊝﹏ the little sign that appears around the app - and the wave it sends across the grid */
   .panel-sign, .grid-empty-sign {
     text-align: center; color: var(--faint); opacity: 0.6; letter-spacing: 0.3em; margin-top: 14px;
     font-family: 'IBM Plex Mono', 'Noto Sans Egyptian Hieroglyphs', 'Segoe UI Historic', 'Noto Sans Symbols', 'Apple Symbols', monospace;
@@ -935,7 +935,7 @@
     Score each week honestly, once it's over.<br>
     No one is watching. The record is yours alone.
   </p>
-  <div class="privacy-note">🔒 Nothing here is uploaded anywhere — everything you enter stays in this browser, on this device.</div>
+  <div class="privacy-note">🔒 Nothing here is uploaded anywhere - everything you enter stays in this browser, on this device.</div>
 </div>
 
 <!-- Start date -->
@@ -974,10 +974,10 @@
 
 <!-- Advanced panel -->
 <div class="advanced-panel" id="advPanel">
-  <div class="adv-header">Change any period's dates or name — leave a date blank to keep the automatic one. Changing where a period starts or ends moves its neighbour's automatic date with it. You can also add your own periods: a custom period cuts into whatever's underneath it, so it doesn't have to line up with a term or break. Each week belongs to the period its first day falls in, so a period needs to include at least one week's first day to show up.</div>
+  <div class="adv-header">Change any period's dates or name - leave a date blank to keep the automatic one. Changing where a period starts or ends moves its neighbour's automatic date with it. You can also add your own periods: a custom period cuts into whatever's underneath it, so it doesn't have to line up with a term or break. Each week belongs to the period its first day falls in, so a period needs to include at least one week's first day to show up.</div>
   <div class="adv-body">
     <div class="adv-rename-section" id="advRenameSection">
-      <div class="adv-rename-title">Rename periods <span class="adv-rename-hint">(applies to all years — leave blank to keep the default name)</span></div>
+      <div class="adv-rename-title">Rename periods <span class="adv-rename-hint">(applies to all years - leave blank to keep the default name)</span></div>
       <div class="adv-rename-row" id="advRenameRow"></div>
     </div>
     <div class="adv-grid" id="advGrid"></div>
@@ -1008,7 +1008,7 @@
 <!-- Current week bar -->
 <div class="cwbar">
   <div class="cwbar-left">
-    <strong id="cwTitle">—</strong>
+    <strong id="cwTitle">-</strong>
     <span id="cwDetail"></span>
   </div>
   <div class="cwbar-right">
@@ -1019,10 +1019,10 @@
 
 <!-- Stats -->
 <div class="stats">
-  <div class="stat"><span class="stat-num s-gone" id="st-gone">—</span><span class="stat-label">weeks<br>elapsed</span></div>
-  <div class="stat"><span class="stat-num s-score" id="st-scored">—</span><span class="stat-label">weeks<br>scored</span></div>
-  <div class="stat"><span class="stat-num s-avg" id="st-avg">—</span><span class="stat-label">average<br>score</span></div>
-  <div class="stat"><span class="stat-num s-left" id="st-left">—</span><span class="stat-label">weeks<br>remaining</span></div>
+  <div class="stat"><span class="stat-num s-gone" id="st-gone">-</span><span class="stat-label">weeks<br>elapsed</span></div>
+  <div class="stat"><span class="stat-num s-score" id="st-scored">-</span><span class="stat-label">weeks<br>scored</span></div>
+  <div class="stat"><span class="stat-num s-avg" id="st-avg">-</span><span class="stat-label">average<br>score</span></div>
+  <div class="stat"><span class="stat-num s-left" id="st-left">-</span><span class="stat-label">weeks<br>remaining</span></div>
 </div>
 
 <!-- Legend -->
@@ -1058,7 +1058,7 @@
 
 <!-- Insights panel -->
 <div class="advanced-panel" id="insightPanel">
-  <div class="adv-header">Insights — computed from your scored weeks only</div>
+  <div class="adv-header">Insights - computed from your scored weeks only</div>
   <div class="adv-body" id="insightBody">
     <div class="insight-empty">Score a few weeks to unlock insights.</div>
   </div>
@@ -1066,7 +1066,7 @@
 
 <!-- Placement Tracker panel -->
 <div class="advanced-panel" id="placementPanel">
-  <div class="adv-header">Placement Tracker — log applications and interview rounds as they happen. Private, same as everything else here.</div>
+  <div class="adv-header">Placement Tracker - log applications and interview rounds as they happen. Private, same as everything else here.</div>
   <div class="adv-body">
     <div class="placement-stats" id="placementStats"></div>
 
@@ -1096,7 +1096,7 @@
 
 <div class="quote">
   <p>"The question is not whether you'll be distracted and lazy sometimes.<br>The question is whether you'll notice, and what you'll do next."</p>
-  <cite>— adapted from Oliver Burkeman</cite>
+  <cite>- adapted from Oliver Burkeman</cite>
 </div>
 
 <!-- ﹏𓊝﹏ -->
@@ -1145,7 +1145,7 @@
   </div>
 </dialog>
 
-<!-- "Done — Undo" bar shown after clearing a week or deleting a placement entry -->
+<!-- "Done - Undo" bar shown after clearing a week or deleting a placement entry -->
 <div class="toast" id="toast" role="status" aria-live="polite" hidden>
   <span id="toastText"></span>
   <button type="button" id="toastUndo">Undo</button>
@@ -1153,7 +1153,7 @@
 
 <div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
 
-<!-- PWA install prompt — shown when the browser offers installation -->
+<!-- PWA install prompt - shown when the browser offers installation -->
 <div class="install-banner" id="installBanner" hidden>
   <span>Install as an app on this device</span>
   <button type="button" class="install-btn" id="installBtn">Install</button>
@@ -1200,10 +1200,10 @@ window.addEventListener('appinstalled', () => {
 <script src="calendar.js"></script>
 <script src="data.js"></script>
 <script>
-// ﹏𓊝﹏ Academic Life Tracker — made by Arush Giri
+// ﹏𓊝﹏ Academic Life Tracker - made by Arush Giri
 const SIGN = '﹏𓊝﹏';
 console.log('%c' + SIGN, 'font-size:20px;letter-spacing:4px;',
-  '\nAcademic Life Tracker — made by Arush Giri');
+  '\nAcademic Life Tracker - made by Arush Giri');
 
 const {
   PRESET_NAMES, pd, ds, presetLayout, defaultPeriodsForYear,
@@ -1227,7 +1227,7 @@ const KEY_CUSTOM          = 'ugt_custom_periods_v5';  // per year: [{ name, kind
 const KEY_SCORES          = 'ugt_scores_v6';          // { 'YYYY-MM-DD': 1–5 }, date = any day of the week
 const KEY_NOTES           = 'ugt_notes_v6';           // { 'YYYY-MM-DD': { note, tags[] } }
 const KEY_PLACEMENT       = 'ugt_placement_v5';       // [{ id, company, stage, date, note }]
-const KEY_PLACEMENT_MODE  = 'ugt_placement_mode_v7';  // 'auto' | 'on' | 'off' — when the tracker is shown
+const KEY_PLACEMENT_MODE  = 'ugt_placement_mode_v7';  // 'auto' | 'on' | 'off' - when the tracker is shown
 const KEY_LAST_BACKUP     = 'ugt_last_backup_v6';     // ISO time of the last export from this browser
 const KEY_SCORES_LEGACY   = 'ugt_scores_v5';          // pre-v6, keyed by week number; migrated on load
 const KEY_NOTES_LEGACY    = 'ugt_notes_v5';
@@ -1235,7 +1235,7 @@ const KEY_LEGACY_ARCHIVE  = 'ugt_v5_archive';         // untouched copy of the p
 const KEY_THEME           = 'ugt_theme_v5';           // 'light' | 'dark' (a setting, not data)
 const KEY_NOTIFY          = 'ugt_notify_v5';          // retired setting; only cleared on reset
 
-// Everything that's the user's data — what Import replaces and Reset deletes.
+// Everything that's the user's data - what Import replaces and Reset deletes.
 const ALL_DATA_KEYS = [KEY_START, KEY_YEARS, KEY_CALENDAR_PRESET, KEY_OVERRIDES, KEY_PERIOD_NAMES,
   KEY_CUSTOM, KEY_SCORES, KEY_NOTES, KEY_PLACEMENT, KEY_PLACEMENT_MODE, KEY_LAST_BACKUP,
   KEY_SCORES_LEGACY, KEY_NOTES_LEGACY, KEY_LEGACY_ARCHIVE];
@@ -1265,7 +1265,7 @@ function fmtMo(d) {
 }
 
 // ─────────────────────────────────────────────
-// STATE — loaded from storage, cleaned by data.js
+// STATE - loaded from storage, cleaned by data.js
 // ─────────────────────────────────────────────
 let programYears    = 4;
 let calendarPreset  = 'semester';
@@ -1274,7 +1274,7 @@ let periodNames     = {};  // see KEY_PERIOD_NAMES
 let customPeriods   = [];  // see KEY_CUSTOM
 let scores          = {};  // see KEY_SCORES
 let notesTags       = {};  // see KEY_NOTES
-let placementEvents = [];  // see KEY_PLACEMENT — matched to weeks by date when drawn
+let placementEvents = [];  // see KEY_PLACEMENT - matched to weeks by date when drawn
 let placementMode   = 'auto'; // see KEY_PLACEMENT_MODE
 let weekData        = [];  // the built calendar: one entry per week (calendar.js buildWeeks)
 let editingPlacementId = null; // placement entry being edited in the form, if any
@@ -1446,7 +1446,7 @@ document.getElementById('toastUndo').addEventListener('click', () => {
 });
 
 // ─────────────────────────────────────────────
-// ADVANCED PANEL — per-year date overrides, renames, and custom periods
+// ADVANCED PANEL - per-year date overrides, renames, and custom periods
 // Works the same for every calendar type: each type's periods have stable slot ids
 // (calendar.js PRESETS), and overrides/renames are stored by slot.
 // ─────────────────────────────────────────────
@@ -1471,7 +1471,7 @@ function createCustomPeriodRow(data) {
 
   const kindSel = el('select');
   kindSel.dataset.field = 'kind';
-  kindSel.setAttribute('aria-label', 'Custom period type — term or break');
+  kindSel.setAttribute('aria-label', 'Custom period type - term or break');
   [['sem', 'Term'], ['break', 'Break']].forEach(([value, label]) => {
     kindSel.append(el('option', { value, textContent: label, selected: (data.kind || 'sem') === value }));
   });
@@ -1656,7 +1656,7 @@ let weekEls = [];
 const gridEl  = document.getElementById('grid');
 const tooltip = document.getElementById('tooltip');
 
-// Tooltip — for mouse/pen hover and keyboard focus only. On touch screens a tap opens the
+// Tooltip - for mouse/pen hover and keyboard focus only. On touch screens a tap opens the
 // score modal, which shows the same details, so the tooltip would only get stuck on screen.
 let lastInput = 'mouse'; // 'mouse' | 'pen' | 'touch' | 'keyboard'
 document.addEventListener('pointerdown', e => { lastInput = e.pointerType || 'mouse'; }, true);
@@ -1668,7 +1668,7 @@ function placeTooltip(x, y) {
   let left = x + 14, top = y - r.height - 10;
   if (left + r.width > window.innerWidth - m) left = x - r.width - 14; // flip to the left side
   left = Math.max(m, left);
-  if (top < m) top = y + 20; // no room above — show below
+  if (top < m) top = y + 20; // no room above - show below
   tooltip.style.left = left + 'px';
   tooltip.style.top  = top + 'px';
 }
@@ -1695,7 +1695,7 @@ function currentGi() {
 function renderGrid() {
   gridEl.innerHTML = '';
   weekEls = [];
-  indexWeekKeys(); // weekData may have just been rebuilt — re-match stored entries to weeks
+  indexWeekKeys(); // weekData may have just been rebuilt - re-match stored entries to weeks
 
   if (!weekData.length) {
     gridEl.innerHTML = '<div class="grid-empty">Enter your start date above and click <strong class="accent">Build my calendar</strong><div class="grid-empty-sign" aria-hidden="true">﹏𓊝﹏</div></div>';
@@ -1718,7 +1718,7 @@ function renderGrid() {
 
     const yl = document.createElement('div');
     yl.className = 'year-label';
-    yl.textContent = `— Year ${y}  ·  ${yWeeks[0].weekStart.getFullYear()}–${yWeeks[yWeeks.length-1].weekEnd.getFullYear()} —`;
+    yl.textContent = `- Year ${y}  ·  ${yWeeks[0].weekStart.getFullYear()}–${yWeeks[yWeeks.length-1].weekEnd.getFullYear()} -`;
     yBlock.appendChild(yl);
 
     // One row per run of consecutive weeks in the same period
@@ -1848,7 +1848,7 @@ function renderGrid() {
 function updateCwBar(cgi) {
   document.getElementById('cwToday').textContent = fmt(today());
   if (!weekData.length) {
-    document.getElementById('cwTitle').textContent  = '—';
+    document.getElementById('cwTitle').textContent  = '-';
     document.getElementById('cwDetail').textContent = 'Enter your start date above to begin';
     document.getElementById('cwOverall').textContent = '';
     return;
@@ -1874,12 +1874,12 @@ function updateCwBar(cgi) {
 
 function updateStats() {
   if (!weekData.length) {
-    ['st-gone','st-scored','st-avg','st-left'].forEach(id => document.getElementById(id).textContent = '—');
+    ['st-gone','st-scored','st-avg','st-left'].forEach(id => document.getElementById(id).textContent = '-');
     return;
   }
   const tod = today();
   if (tod < weekData[0].weekStart) {
-    ['st-gone','st-scored','st-avg','st-left'].forEach(id => document.getElementById(id).textContent = '—');
+    ['st-gone','st-scored','st-avg','st-left'].forEach(id => document.getElementById(id).textContent = '-');
     return;
   }
   let gone = 0, scored = 0, sum = 0, left = 0;
@@ -1896,12 +1896,12 @@ function updateStats() {
   });
   document.getElementById('st-gone').textContent   = gone;
   document.getElementById('st-scored').textContent = scored;
-  document.getElementById('st-avg').textContent    = scored > 0 ? (sum / scored).toFixed(1) : '—';
+  document.getElementById('st-avg').textContent    = scored > 0 ? (sum / scored).toFixed(1) : '-';
   document.getElementById('st-left').textContent   = left;
 }
 
 // ─────────────────────────────────────────────
-// NUDGE BANNER — surface unscored past/current weeks
+// NUDGE BANNER - surface unscored past/current weeks
 // ─────────────────────────────────────────────
 const nudgeBanner   = document.getElementById('nudgeBanner');
 const nudgeText     = document.getElementById('nudgeText');
@@ -1942,7 +1942,7 @@ function updateNudgeBanner(cgi) {
 btnScoreNext.addEventListener('click', () => { if (nudgeTargetGi >= 0) openModal(nudgeTargetGi); });
 
 // ─────────────────────────────────────────────
-// INSIGHTS — trends, streaks, term vs break, best/worst week
+// INSIGHTS - trends, streaks, term vs break, best/worst week
 // ─────────────────────────────────────────────
 const insightPanel     = document.getElementById('insightPanel');
 const insightToggleBtn = document.getElementById('insightToggleBtn');
@@ -1980,13 +1980,13 @@ function computeInsights() {
   scoredEntries.forEach(gi => {
     const wd = weekData[gi], sc = scoreAt(gi);
     if (wd.kind === 'break') { brkSum += sc; brkN++; } else { termSum += sc; termN++; }
-    // `=== null`, not `!best` — week 0 is a valid index.
+    // `=== null`, not `!best` - week 0 is a valid index.
     if (best === null || sc > scoreAt(best) || (sc === scoreAt(best) && gi > best)) best = gi;
     if (worst === null || sc < scoreAt(worst) || (sc === scoreAt(worst) && gi > worst)) worst = gi;
   });
 
   // Consecutive calendar weeks scored ≥4. An unscored week breaks the streak like a low
-  // score does — skipping gaps would overstate consistency.
+  // score does - skipping gaps would overstate consistency.
   let curStreak = 0, bestStreak = 0;
   const maxGi = scoredEntries[scoredEntries.length - 1];
   for (let i = 0; i <= maxGi; i++) {
@@ -2104,19 +2104,19 @@ function updateInsights() {
   const tagStatsHtml = data.tagStats.length
     ? `<div class="tag-chips">${data.tagStats.slice(0, 14).map(t =>
         `<button type="button" class="tag-chip${t.tag === filterTag ? ' active' : ''}" data-tag="${escapeHtml(t.tag)}">#${escapeHtml(t.tag)} · ${t.count} · avg ${t.avg.toFixed(1)}</button>`
-      ).join('')}</div>${filterTag ? `<div class="ic-sub filter-note">Grid filtered to <strong>#${escapeHtml(filterTag)}</strong> — click it again, or <button type="button" id="clearTagFilterBtn" class="btn-danger-text">clear</button></div>` : ''}`
-    : '<div class="insight-empty compact">No tags yet — add some from the score modal to spot patterns.</div>';
+      ).join('')}</div>${filterTag ? `<div class="ic-sub filter-note">Grid filtered to <strong>#${escapeHtml(filterTag)}</strong> - click it again, or <button type="button" id="clearTagFilterBtn" class="btn-danger-text">clear</button></div>` : ''}`
+    : '<div class="insight-empty compact">No tags yet - add some from the score modal to spot patterns.</div>';
 
   insightBody.innerHTML = `
     <div class="insight-cards">
       <div class="insight-card">
         <span class="ic-label">Term-time avg</span>
-        <span class="ic-value">${data.termAvg !== null ? data.termAvg.toFixed(2) : '—'}</span>
+        <span class="ic-value">${data.termAvg !== null ? data.termAvg.toFixed(2) : '-'}</span>
         <span class="ic-sub">during term time</span>
       </div>
       <div class="insight-card">
         <span class="ic-label">Break avg</span>
-        <span class="ic-value">${data.brkAvg !== null ? data.brkAvg.toFixed(2) : '—'}</span>
+        <span class="ic-value">${data.brkAvg !== null ? data.brkAvg.toFixed(2) : '-'}</span>
         <span class="ic-sub">during breaks</span>
       </div>
       <div class="insight-card">
@@ -2149,7 +2149,7 @@ function updateInsights() {
       ${renderBarChart(data.periodBars)}
     </div>
     <div class="insight-chart-wrap">
-      <div class="insight-chart-title">By tag — click one to filter the grid</div>
+      <div class="insight-chart-title">By tag - click one to filter the grid</div>
       ${tagStatsHtml}
     </div>
     <div class="panel-sign" aria-hidden="true">${SIGN}</div>
@@ -2366,8 +2366,8 @@ function setPlacementOpen(open) {
 placementToggleBtn.addEventListener('click', () => setPlacementOpen(!placementOpen));
 
 // Whether the placement tracker is shown at all (button, panel, gold dots, mentions on weeks).
-// "auto" shows it from the start of the program's final year — when placement season
-// happens — and always once anything has been logged, so existing entries never vanish.
+// "auto" shows it from the start of the program's final year - when placement season
+// happens - and always once anything has been logged, so existing entries never vanish.
 // The data itself is never touched by this setting.
 function placementsVisible() {
   if (placementMode === 'on') return true;
@@ -2386,7 +2386,7 @@ const placementModeSelect = document.getElementById('placementMode');
 placementModeSelect.addEventListener('change', () => {
   placementMode = placementModeSelect.value;
   writeStr(KEY_PLACEMENT_MODE, placementMode);
-  renderGrid(); // applies straight away — no need to rebuild the calendar
+  renderGrid(); // applies straight away - no need to rebuild the calendar
   if (placementMode === 'on' && !placementOpen) setPlacementOpen(true);
 });
 
@@ -2435,7 +2435,7 @@ tagInputEl.addEventListener('keydown', e => {
 function openModal(gi) {
   activeGi = gi;
   const wd = weekData[gi];
-  modalTitle.textContent = `${wd.periodName} — Week ${wd.weekInPeriod}`;
+  modalTitle.textContent = `${wd.periodName} - Week ${wd.weekInPeriod}`;
   modalSub.textContent   = `Year ${wd.year} · ${fmt(wd.weekStart)} – ${fmt(wd.weekEnd)}`;
   const weekPlacements = placementsVisible() ? (computePlacementGiMap().get(gi) || []) : [];
   document.getElementById('modal-placements').textContent = weekPlacements.length
@@ -2464,7 +2464,7 @@ function closeModal() {
   overlay.classList.remove('open');
   const gi = activeGi;
   activeGi = null;
-  // Return focus to the square that opened this modal, not wherever the mouse happens to be —
+  // Return focus to the square that opened this modal, not wherever the mouse happens to be -
   // re-looked-up by index since renderGrid() may have already rebuilt the DOM by this point.
   if (gi !== null && weekEls[gi]) {
     weekEls[gi].focus();
@@ -2491,7 +2491,7 @@ overlay.addEventListener('keydown', (e) => {
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 });
 
-// No "are you sure?" — clearing is instant, with an Undo bar for 8 seconds instead.
+// No "are you sure?" - clearing is instant, with an Undo bar for 8 seconds instead.
 document.getElementById('btnClear').addEventListener('click', () => {
   if (activeGi === null) return;
   const gi = activeGi, wd = weekData[gi];
@@ -2499,7 +2499,7 @@ document.getElementById('btnClear').addEventListener('click', () => {
   if (!prevScore && !prevMeta) { closeModal(); return; }
   setWeekEntry(gi, null, null);
   saveScores(); saveNotesTags(); renderGrid(); closeModal();
-  showUndoToast(`Cleared ${wd.periodName} — week ${wd.weekInPeriod}`, () => {
+  showUndoToast(`Cleared ${wd.periodName} - week ${wd.weekInPeriod}`, () => {
     // Find the week by date, in case the calendar changed in the meantime.
     const back = giForDate(weekData, wd.weekStart);
     if (back < 0) return;
@@ -2529,7 +2529,7 @@ document.getElementById('btnSaveWeek').addEventListener('click', () => {
 });
 
 // ─────────────────────────────────────────────
-// DATA BACKUP — export / import / reset
+// DATA BACKUP - export / import / reset
 // ─────────────────────────────────────────────
 // Shows how long ago the last backup was, and turns red after 30 days (or if there's never
 // been one and there's something to lose).
@@ -2621,7 +2621,7 @@ document.getElementById('btnResetAll').addEventListener('click', async () => {
 });
 
 // ─────────────────────────────────────────────
-// SHARE AS IMAGE — draws the grid to a PNG, then shares (phones) or downloads (desktop) it
+// SHARE AS IMAGE - draws the grid to a PNG, then shares (phones) or downloads (desktop) it
 // ─────────────────────────────────────────────
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -2684,7 +2684,7 @@ function exportGridPng() {
   const weekScores = weekData.map(wd => scoreAt(wd.gi)).filter(Boolean);
   const scoredCount = weekScores.length;
   const sum = weekScores.reduce((a, v) => a + v, 0);
-  const avg = scoredCount ? (sum / scoredCount).toFixed(2) : '—';
+  const avg = scoredCount ? (sum / scoredCount).toFixed(2) : '-';
   ctx.font = "11px 'IBM Plex Mono', monospace";
   ctx.fillStyle = muted;
   ctx.fillText(`${scoredCount} weeks scored · ${avg} average · exported ${fmt(tod)}`, pad, 54);
@@ -2749,7 +2749,7 @@ function exportGridPng() {
         return;
       } catch (err) {
         if (err && err.name === 'AbortError') return; // user closed the share sheet
-        // any other failure (e.g. share not allowed here) — fall through to a plain download
+        // any other failure (e.g. share not allowed here) - fall through to a plain download
       }
     }
     downloadBlob(blob, filename);
@@ -2770,7 +2770,7 @@ function downloadBlob(blob, filename) {
 document.getElementById('btnSharePng').addEventListener('click', exportGridPng);
 
 // ─────────────────────────────────────────────
-// EXPORT JOURNAL — a readable Markdown diary (the JSON backup is for restoring into the app)
+// EXPORT JOURNAL - a readable Markdown diary (the JSON backup is for restoring into the app)
 // ─────────────────────────────────────────────
 function exportJournalMarkdown() {
   if (!weekData.length) { uiAlert('Nothing to export yet', 'Build your calendar first.'); return; }
@@ -2796,7 +2796,7 @@ function exportJournalMarkdown() {
     const sc = scoreAt(wd.gi);
     const stars = '★'.repeat(sc) + '☆'.repeat(5 - sc);
     lines.push('');
-    lines.push(`**Week of ${fmt(wd.weekStart)}** — ${stars} (${sc}/5)`);
+    lines.push(`**Week of ${fmt(wd.weekStart)}** - ${stars} (${sc}/5)`);
     if (meta && meta.tags && meta.tags.length) {
       lines.push(`Tags: ${meta.tags.map(t => '#' + t).join(' ')}`);
     }
@@ -2861,7 +2861,7 @@ function signWave() {
   void gridEl.offsetWidth; // restart the animation if it's already running
   gridEl.classList.add('signwave');
   setTimeout(() => gridEl.classList.remove('signwave'), 600 + weekData.length * 6 + 200);
-  showUndoToast(`${SIGN}  made with care by Arush Giri`, null);
+  showUndoToast(`${SIGN}  made with ♡ by Arush Giri`, null);
 }
 document.getElementById('signMark').addEventListener('click', signWave);
 
