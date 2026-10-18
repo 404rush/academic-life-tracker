@@ -1,13 +1,13 @@
-// Academic Life Tracker — offline support.  ﹏𓊝﹏ made by Arush Giri
+// Academic Life Tracker - offline support.  ﹏𓊝﹏ made by Arush Giri
 //
-// Network first, cache as fallback: when online you always get the latest version (and
-// index.html, calendar.js and data.js always come from the same release); when offline,
+// Network first, cache as fallback: when online you always get the latest version
+// (and index.html, calendar.js and data.js always come from the same release); when offline,
 // or when the network takes more than a few seconds, the cached copy is used instead.
 // Google Fonts aren't cached, so offline the app falls back to system fonts.
 //
-// ► Change VERSION on every release (match the zip, e.g. 'V11' for V11). That installs this worker
-//   again, which re-downloads the files below into a fresh cache and deletes the old one.
-const VERSION = 'V10';
+//  Self note: Change VERSION on every release (e.g. 'V11' for V11). That installs this worker
+//  again, which re-downloads the files below into a fresh cache and deletes the old one.
+const VERSION = 'v10.2';
 const CACHE_NAME = `academic-life-tracker-${VERSION}`;
 const APP_SHELL = [
   './',
@@ -57,7 +57,7 @@ function fetchWithTimeout(req) {
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return; // fonts etc. go straight to the network
+  if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
     fetchWithTimeout(req)
