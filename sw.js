@@ -1,4 +1,4 @@
-// Academic Life Tracker — offline support.  ﹏𓊝﹏ made by Arush Giri
+// Academic Life Tracker - offline support.  ﹏𓊝﹏ made by Arush Giri
 //
 // Network first, cache as fallback: when online you always get the latest version (and
 // index.html, calendar.js and data.js always come from the same release); when offline,
@@ -38,7 +38,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // cache: 'no-cache' asks the server whether the file changed (a quick check) instead of using
-// the browser's HTTP cache — GitHub Pages lets browsers cache files for 10 minutes, which would
+// the browser's HTTP cache - GitHub Pages lets browsers cache files for 10 minutes, which would
 // otherwise keep showing the old version for a while after you publish.
 // (Page loads are "navigate" requests, which can't be copied with new options, so those are
 // re-requested by URL.)
