@@ -1,4 +1,4 @@
-// Academic Life Tracker — cleaning stored and imported data.  ﹏𓊝﹏ made by Arush Giri
+// Academic Life Tracker - cleaning stored and imported data.  ﹏𓊝﹏ made by Arush Giri
 //
 // Everything that comes out of localStorage or an imported backup passes through here
 // before the app uses it. A backup can come from anywhere, so a well-formed-looking file
@@ -24,7 +24,7 @@
   // Score and note keys are dates ('YYYY-MM-DD'). `legacy` accepts the pre-v6 week numbers.
   function isEntryKey(k, legacy) { return legacy ? /^\d+$/.test(k) : !!pd(k); }
 
-  // { key: 1–5 } — whole numbers only.
+  // { key: 1–5 } - whole numbers only.
   function sanitizeScores(raw, legacy) {
     const out = {};
     if (!isPlainObject(raw)) return out;
@@ -35,7 +35,7 @@
     return out;
   }
 
-  // { key: { note: string, tags: string[] } } — entries with neither are dropped.
+  // { key: { note: string, tags: string[] } } - entries with neither are dropped.
   function sanitizeNotes(raw, legacy) {
     const out = {};
     if (!isPlainObject(raw)) return out;
@@ -86,7 +86,7 @@
     return out;
   }
 
-  // [{ id, company, stage, date, note }] — entries without a company or a valid date are dropped.
+  // [{ id, company, stage, date, note }] - entries without a company or a valid date are dropped.
   function sanitizePlacementEvents(raw) {
     if (!Array.isArray(raw)) return [];
     return raw

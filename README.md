@@ -125,6 +125,7 @@ MIT. Use it, change it, share it, even sell it if you want to. All I ask is that
 
 ## Contact
 
-I'm Arush Giri. If you find a bug or have an idea, email me at [rush.outward120@passinbox.com](mailto:rush.outward120@passinbox.com).
+I'm Arush Giri. 
+If you find a bug, have a suggestion or have an idea, email me at [rush.outward120@passinbox.com](mailto:rush.outward120@passinbox.com).
 
 ﹏𓊝﹏
