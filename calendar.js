@@ -226,7 +226,7 @@
       } else if (e < s) {
         problems.push(`Year ${yi + 1} "${label}": end date is before the start date.`);
       } else if (daysBetween(s, e) > MAX_PERIOD_DAYS) {
-        problems.push(`Year ${yi + 1} "${label}": spans ~${Math.round(daysBetween(s, e) / 7)} weeks - check the dates.`);
+        problems.push(`Year ${yi + 1} "${label}": spans ~${Math.round(daysBetween(s, e) / 7)} weeks — check the dates.`);
       }
     }));
     return problems;
@@ -243,7 +243,7 @@
       if (p.end < p.start) {
         problems.push(`Year ${p.yi + 1} ${p.name}: end date is before the start date.`);
       } else if (daysBetween(p.start, p.end) > MAX_PERIOD_DAYS) {
-        problems.push(`Year ${p.yi + 1} ${p.name}: spans ~${Math.round(daysBetween(p.start, p.end) / 7)} weeks - check the year, that's probably a typo.`);
+        problems.push(`Year ${p.yi + 1} ${p.name}: spans ~${Math.round(daysBetween(p.start, p.end) / 7)} weeks — check the year, that's probably a typo.`);
       }
     });
     return problems;
@@ -273,7 +273,7 @@
         const label = `Year ${yi + 1} "${c.name || 'custom period'}"`;
         const home = ranges.findIndex(x => cs >= x.start && cs <= x.end);
         problems.push(home >= 0
-          ? `${label} starts on ${fmtDate(cs)}, which is in Year ${home + 1} - add it under Year ${home + 1} instead.`
+          ? `${label} starts on ${fmtDate(cs)}, which is in Year ${home + 1} — add it under Year ${home + 1} instead.`
           : `${label} starts on ${fmtDate(cs)}, outside your program (${fmtDate(ranges[0].start)} to ${fmtDate(ranges[years - 1].end)}).`);
       });
     });
