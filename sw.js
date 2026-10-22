@@ -7,7 +7,7 @@
 //
 // ► Change VERSION on every release (match the zip, e.g. 'V11' for V11). That installs this worker
 //   again, which re-downloads the files below into a fresh cache and deletes the old one.
-const VERSION = 'V10';
+const VERSION = 'v10.2';
 const CACHE_NAME = `academic-life-tracker-${VERSION}`;
 const APP_SHELL = [
   './',
