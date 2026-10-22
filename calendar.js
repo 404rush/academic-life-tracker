@@ -29,7 +29,7 @@
   // Whole days from a to b, rounded so DST's 23/25-hour days don't throw it off.
   function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
-  // - Calendar layouts -----------─
+  // Calendar layouts
   // One year of each calendar type, as week offsets from that year's start date.
   // `slot` is a stable id for the period, used as the key for its date overrides
   // (`<slot>_s`, `<slot>_e`) and its rename. The semester slots keep their original
