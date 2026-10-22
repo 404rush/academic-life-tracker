@@ -1,4 +1,4 @@
-// Academic Life Tracker — calendar logic.  ﹏𓊝﹏ made by Arush Giri
+// Academic Life Tracker - calendar logic.  ﹏𓊝﹏ made by Arush Giri
 //
 // Pure functions only: no DOM, no localStorage. index.html loads this as a plain <script>
 // (so the app still works when opened straight from disk), and the tests load it in Node.
@@ -10,7 +10,7 @@
   // so it can't generate thousands of weeks and freeze the tab.
   const MAX_WEEKS_PER_PERIOD = 130;
 
-  // ── Dates ──────────────────────────────────
+  // Dates
   // All dates are local midnight. Strings are always 'YYYY-MM-DD'.
 
   function pd(s) {
@@ -29,7 +29,7 @@
   // Whole days from a to b, rounded so DST's 23/25-hour days don't throw it off.
   function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
-  // ── Calendar layouts ───────────────────────
+  // - Calendar layouts -----------─
   // One year of each calendar type, as week offsets from that year's start date.
   // `slot` is a stable id for the period, used as the key for its date overrides
   // (`<slot>_s`, `<slot>_e`) and its rename. The semester slots keep their original
@@ -70,7 +70,7 @@
     }));
   }
 
-  // ── Building the timeline ──────────────────
+  // - Building the timeline ---------
 
   // Cuts custom periods into a list of base periods. Wherever a custom period overlaps a
   // base period, the base period is trimmed, split around it, or dropped, and the custom
@@ -155,7 +155,7 @@
   function weekAnchorKey(weekStart) { return ds(addDays(weekStart, 3)); }
 
   // The program as a list of consecutive 7-day weeks. One cursor walks the whole timeline
-  // in 7-day steps, and each week belongs to the period its first day falls in — so weeks
+  // in 7-day steps, and each week belongs to the period its first day falls in - so weeks
   // never overlap, even when custom periods or overrides leave no gap between periods.
   // A week can't start on any weekday but the program's first day, which is why a period
   // that contains no week's first day (e.g. a Wed–Fri fest) gets no weeks at all.
@@ -211,7 +211,7 @@
     return gi < weeks.length ? gi : -1;
   }
 
-  // ── Validation ─────────────────────────────
+  // - Validation --------------─
   // Each returns a list of human-readable problems; empty means fine.
 
   const MAX_PERIOD_DAYS = 400;
@@ -226,7 +226,7 @@
       } else if (e < s) {
         problems.push(`Year ${yi + 1} "${label}": end date is before the start date.`);
       } else if (daysBetween(s, e) > MAX_PERIOD_DAYS) {
-        problems.push(`Year ${yi + 1} "${label}": spans ~${Math.round(daysBetween(s, e) / 7)} weeks — check the dates.`);
+        problems.push(`Year ${yi + 1} "${label}": spans ~${Math.round(daysBetween(s, e) / 7)} weeks - check the dates.`);
       }
     }));
     return problems;
@@ -243,7 +243,7 @@
       if (p.end < p.start) {
         problems.push(`Year ${p.yi + 1} ${p.name}: end date is before the start date.`);
       } else if (daysBetween(p.start, p.end) > MAX_PERIOD_DAYS) {
-        problems.push(`Year ${p.yi + 1} ${p.name}: spans ~${Math.round(daysBetween(p.start, p.end) / 7)} weeks — check the year, that's probably a typo.`);
+        problems.push(`Year ${p.yi + 1} ${p.name}: spans ~${Math.round(daysBetween(p.start, p.end) / 7)} weeks - check the year, that's probably a typo.`);
       }
     });
     return problems;
@@ -273,7 +273,7 @@
         const label = `Year ${yi + 1} "${c.name || 'custom period'}"`;
         const home = ranges.findIndex(x => cs >= x.start && cs <= x.end);
         problems.push(home >= 0
-          ? `${label} starts on ${fmtDate(cs)}, which is in Year ${home + 1} — add it under Year ${home + 1} instead.`
+          ? `${label} starts on ${fmtDate(cs)}, which is in Year ${home + 1} - add it under Year ${home + 1} instead.`
           : `${label} starts on ${fmtDate(cs)}, outside your program (${fmtDate(ranges[0].start)} to ${fmtDate(ranges[years - 1].end)}).`);
       });
     });
